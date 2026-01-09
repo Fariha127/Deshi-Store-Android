@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,6 +94,16 @@ public class ProductDetailsActivity extends AppCompatActivity {
         etReview = findViewById(R.id.etReview);
         btnSubmitReview = findViewById(R.id.btnSubmitReview);
         rvReviews = findViewById(R.id.rvReviews);
+        
+        checkLoginStatus();
+    }
+    
+    private void checkLoginStatus() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            btnLogin.setVisibility(View.GONE);
+            btnSignUp.setVisibility(View.GONE);
+        }
     }
 
     private void loadProductData() {
@@ -230,28 +242,33 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         // Navigation buttons
         btnHome.setOnClickListener(v -> {
-            // Navigate to Home
+            startActivity(new Intent(this, HomeActivity.class));
             finish();
         });
 
         btnAllProducts.setOnClickListener(v -> {
-            Toast.makeText(this, "All Products", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, AllProductsActivity.class));
+            finish();
         });
 
         btnProductCategories.setOnClickListener(v -> {
-            Toast.makeText(this, "Product Categories", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, ProductCategoriesActivity.class));
+            finish();
         });
 
         btnNewlyAdded.setOnClickListener(v -> {
-            Toast.makeText(this, "Newly Added", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, NewlyAddedActivity.class));
+            finish();
         });
 
         btnMyFavourites.setOnClickListener(v -> {
-            Toast.makeText(this, "My Favourites", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, MyFavouritesActivity.class));
+            finish();
         });
 
         btnFavouriteCategories.setOnClickListener(v -> {
-            Toast.makeText(this, "Favourite Categories", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, FavouriteCategoriesActivity.class));
+            finish();
         });
 
         // Auth buttons

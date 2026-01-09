@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +59,18 @@ public class HomeActivity extends AppCompatActivity {
         // Other views
         tvViewAll = findViewById(R.id.tvViewAll);
         rvProducts = findViewById(R.id.rvProducts);
+        
+        // Hide login/signup buttons if user is logged in
+        checkLoginStatus();
+    }
+    
+    private void checkLoginStatus() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // User is logged in, hide auth buttons
+            btnLogin.setVisibility(View.GONE);
+            btnSignUp.setVisibility(View.GONE);
+        }
     }
 
     private void setupProductList() {

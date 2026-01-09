@@ -83,24 +83,24 @@ public class CategoryProductsActivity extends AppCompatActivity {
         // Filter products by category
         // For now, showing sample products. TODO: Filter by actual category from Firebase
         if ("1".equals(categoryId)) { // Beverages
-            productList.add(new Product("1", "Mojo", "Soft Drink", 25.0, "250ml", "", "Akij Food & Beverage Ltd. (AFBL)", 0, false));
-            productList.add(new Product("5", "Shezan Mango Juice", "Mango Juice", 120.0, "1L", "", "Sajeeb Group", 0, false));
-            productList.add(new Product("3", "Spa Drinking Water", "Water", 20.0, "500ml", "", "Akij Food & Beverage Ltd. (AFBL)", 0, false));
+            productList.add(new Product("1", "Mojo", "Soft Drink", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd. (AFBL)", 0, false));
+            productList.add(new Product("5", "Shezan Mango Juice", "Mango Juice", 120.0, "1L", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/shezan-juice.jpg", "Sajeeb Group", 0, false));
+            productList.add(new Product("3", "Spa Drinking Water", "Water", 20.0, "500ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/spa-water.jpg", "Akij Food & Beverage Ltd. (AFBL)", 0, false));
         } else if ("2".equals(categoryId)) { // Hair Care
-            productList.add(new Product("10", "Jui HairCare Oil", "Hair Oil", 95.0, "200ml", "", "Square Toiletries Ltd.", 0, false));
+            productList.add(new Product("10", "Jui HairCare Oil", "Hair Oil", 95.0, "200ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/jui-oil.jpg", "Square Toiletries Ltd.", 0, false));
         } else if ("3".equals(categoryId)) { // Oral Care
-            productList.add(new Product("2", "MediPlus DS", "Toothpaste", 85.0, "100g", "", "Anfords Bangladesh Ltd.", 0, false));
+            productList.add(new Product("2", "MediPlus DS", "Toothpaste", 85.0, "100g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mediplus.jpg", "Anfords Bangladesh Ltd.", 0, false));
         } else if ("4".equals(categoryId)) { // Snacks
-            productList.add(new Product("7", "Ruchi BBQ Chanachur", "Snack", 30.0, "150g", "", "Pran Foods Ltd.", 0, false));
-            productList.add(new Product("6", "Pran Potata Spicy", "Biscuit", 40.0, "200g", "", "Pran Foods Ltd.", 0, false));
+            productList.add(new Product("7", "Ruchi BBQ Chanachur", "Snack", 30.0, "150g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/ruchi-chanachur.jpg", "Pran Foods Ltd.", 0, false));
+            productList.add(new Product("6", "Pran Potata Spicy", "Biscuit", 40.0, "200g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-potata.jpg", "Pran Foods Ltd.", 0, false));
         } else if ("5".equals(categoryId)) { // Food & Grocery
-            productList.add(new Product("11", "Radhuni Turmeric", "Powder", 55.0, "100g", "", "Square Food & Beverage Ltd.", 0, false));
-            productList.add(new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "", "Pran Dairy Ltd.", 0, false));
+            productList.add(new Product("11", "Radhuni Turmeric", "Powder", 55.0, "100g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/radhuni-tumeric.jpg", "Square Food & Beverage Ltd.", 0, false));
+            productList.add(new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-ghee.jpg", "Pran Dairy Ltd.", 0, false));
         } else if ("6".equals(categoryId)) { // Home Care
-            productList.add(new Product("8", "Bashundhara Towel", "Hand Towel", 80.0, "pack", "", "Bashundhara Paper Mills PLC", 0, false));
+            productList.add(new Product("8", "Bashundhara Towel", "Hand Towel", 80.0, "pack", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/bashundhara-towel.jpg", "Bashundhara Paper Mills PLC", 0, false));
         } else if ("7".equals(categoryId)) { // Skin Care
-            productList.add(new Product("9", "Revive Perfect Skin", "Moisturizing Lotion", 150.0, "100ml", "", "Square Toiletries Ltd.", 0, false));
-            productList.add(new Product("4", "Meril Milk Soap", "Moisturizing Soap", 35.0, "75g", "", "Square Toiletries Ltd.", 0, false));
+            productList.add(new Product("9", "Revive Perfect Skin", "Moisturizing Lotion", 150.0, "100ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/revive-lotion.jpg", "Square Toiletries Ltd.", 0, false));
+            productList.add(new Product("4", "Meril Milk Soap", "Moisturizing Soap", 35.0, "75g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/meril-soap.jpg", "Square Toiletries Ltd.", 0, false));
         }
     }
 

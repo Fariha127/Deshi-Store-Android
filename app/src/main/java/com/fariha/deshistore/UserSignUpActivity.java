@@ -98,11 +98,10 @@ public class UserSignUpActivity extends AppCompatActivity {
         
         btnSendCode.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
-            if (!email.isEmpty()) {
-                Toast.makeText(this, "Verification code sent to " + email, Toast.LENGTH_SHORT).show();
-                // TODO: Implement email verification
+            if (!email.isEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                sendVerificationCode(email);
             } else {
-                Toast.makeText(this, "Please enter email first", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -160,6 +159,12 @@ public class UserSignUpActivity extends AppCompatActivity {
             return;
         }
 
+        // Check if email is verified
+        if (!EmailVerificationActivity.isEmailVerified(this, email)) {
+            Toast.makeText(this, "Please verify your email first by clicking 'Send Code'", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // Create user in Firebase
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -174,6 +179,56 @@ public class UserSignUpActivity extends AppCompatActivity {
                                 task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void sendVerificationCode(String email) {
+        btnSendCode.setEnabled(false);
+        Toast.makeText(this, "Sending verification code...", Toast.LENGTH_SHORT).show();
+
+        // Generate verification code
+        String verificationCode = EmailSender.generateVerificationCode();
+
+        // Send email
+        EmailSender.sendVerificationEmail(email, verificationCode, new EmailSender.EmailCallback() {
+            @Override
+            public void onSending() {
+                // Already showing toast
+            }
+
+            @Override
+            public void onSuccess() {
+                runOnUiThread(() -> {
+                    Toast.makeText(UserSignUpActivity.this, 
+                        "Verification code sent to your email!", Toast.LENGTH_SHORT).show();
+                    
+                    // Launch verification activity
+                    Intent intent = new Intent(UserSignUpActivity.this, EmailVerificationActivity.class);
+                    intent.putExtra("email", email);
+                    intent.putExtra("code", verificationCode);
+                    intent.putExtra("expiry", System.currentTimeMillis() + (10 * 60 * 1000));
+                    startActivityForResult(intent, 100);
+                    
+                    btnSendCode.setEnabled(true);
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> {
+                    Toast.makeText(UserSignUpActivity.this, 
+                        "Failed to send verification code: " + error, Toast.LENGTH_LONG).show();
+                    btnSendCode.setEnabled(true);
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            Toast.makeText(this, "Email verified! You can now register.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void saveUserData(String userId, String fullName, String email, String phoneNumber,

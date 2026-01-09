@@ -89,10 +89,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         });
 
-        // Rate button click
+        // Rate button click - navigate to product details
         holder.btnRate.setOnClickListener(v -> {
-            Toast.makeText(context, "Rate " + product.getName(), Toast.LENGTH_SHORT).show();
-            // TODO: Open rating dialog
+            Intent intent = new Intent(context, ProductDetailsActivity.class);
+            intent.putExtra("product_id", product.getId());
+            context.startActivity(intent);
         });
 
         // Card click - view details
