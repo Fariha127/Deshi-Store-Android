@@ -78,17 +78,32 @@
             android:textColor="@color/white"
             android:textSize="16sp" />
 
-        <EditText
-            android:id="@+id/etPassword"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:background="@android:color/white"
-            android:hint="Enter your password"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:textSize="14sp"
-            android:drawableEnd="@android:drawable/ic_menu_view" />
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:hint="Enter your password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:paddingEnd="48dp"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/ivTogglePassword"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="4dp"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_view"
+                android:contentDescription="Toggle password visibility" />
+        </FrameLayout>
 
         <!-- Login Button -->
         <androidx.appcompat.widget.AppCompatButton

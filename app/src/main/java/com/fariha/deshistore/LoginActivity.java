@@ -2,9 +2,11 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +24,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin, btnBackToHome;
     private TextView tvSignUpCompanyVendor, tvSignUpRetailVendor, tvSignUpUser;
+    private ImageView ivTogglePassword;
+    private boolean isPasswordVisible = false;
     
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -52,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         tvSignUpCompanyVendor = findViewById(R.id.tvSignUpCompanyVendor);
         tvSignUpRetailVendor = findViewById(R.id.tvSignUpRetailVendor);
         tvSignUpUser = findViewById(R.id.tvSignUpUser);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
     }
 
     private void setupLoginTypeSpinner() {
@@ -79,6 +84,17 @@ public class LoginActivity extends AppCompatActivity {
         
         tvSignUpUser.setOnClickListener(v -> {
             startActivity(new Intent(this, UserSignUpActivity.class));
+        });
+
+        ivTogglePassword.setOnClickListener(v -> {
+            if (isPasswordVisible) {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                isPasswordVisible = false;
+            } else {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                isPasswordVisible = true;
+            }
+            etPassword.setSelection(etPassword.getText().length());
         });
     }
 

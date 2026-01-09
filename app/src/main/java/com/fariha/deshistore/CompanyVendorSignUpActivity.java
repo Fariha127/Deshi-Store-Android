@@ -2,8 +2,10 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +24,9 @@ public class CompanyVendorSignUpActivity extends AppCompatActivity {
     private EditText etPassword, etConfirmPassword, etPhoneNumber;
     private EditText etRegistrationNumber, etBSTINumber, etAddress, etTINNumber;
     private Button btnRegister, btnBackToLogin;
+    private ImageView ivTogglePassword, ivToggleConfirmPassword;
+    private boolean isPasswordVisible = false;
+    private boolean isConfirmPasswordVisible = false;
     
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -52,9 +57,33 @@ public class CompanyVendorSignUpActivity extends AppCompatActivity {
         etTINNumber = findViewById(R.id.etTINNumber);
         btnRegister = findViewById(R.id.btnRegister);
         btnBackToLogin = findViewById(R.id.btnBackToLogin);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
     }
 
     private void setupClickListeners() {
+        ivTogglePassword.setOnClickListener(v -> {
+            if (isPasswordVisible) {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                isPasswordVisible = false;
+            } else {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                isPasswordVisible = true;
+            }
+            etPassword.setSelection(etPassword.getText().length());
+        });
+
+        ivToggleConfirmPassword.setOnClickListener(v -> {
+            if (isConfirmPasswordVisible) {
+                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                isConfirmPasswordVisible = false;
+            } else {
+                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                isConfirmPasswordVisible = true;
+            }
+            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
+        });
+        
         btnRegister.setOnClickListener(v -> handleRegistration());
         
         btnBackToLogin.setOnClickListener(v -> {

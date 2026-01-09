@@ -3,9 +3,11 @@ package com.fariha.deshistore;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -26,6 +28,9 @@ public class UserSignUpActivity extends AppCompatActivity {
     private EditText etPhoneNumber, etDateOfBirth, etCity;
     private Spinner spinnerGender;
     private Button btnRegister, btnBackToLogin, btnSendCode;
+    private ImageView ivTogglePassword, ivToggleConfirmPassword;
+    private boolean isPasswordVisible = false;
+    private boolean isConfirmPasswordVisible = false;
     
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -55,6 +60,8 @@ public class UserSignUpActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         btnBackToLogin = findViewById(R.id.btnBackToLogin);
         btnSendCode = findViewById(R.id.btnSendCode);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
     }
 
     private void setupGenderSpinner() {
@@ -66,6 +73,28 @@ public class UserSignUpActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         etDateOfBirth.setOnClickListener(v -> showDatePicker());
+        
+        ivTogglePassword.setOnClickListener(v -> {
+            if (isPasswordVisible) {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                isPasswordVisible = false;
+            } else {
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                isPasswordVisible = true;
+            }
+            etPassword.setSelection(etPassword.getText().length());
+        });
+
+        ivToggleConfirmPassword.setOnClickListener(v -> {
+            if (isConfirmPasswordVisible) {
+                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                isConfirmPasswordVisible = false;
+            } else {
+                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                isConfirmPasswordVisible = true;
+            }
+            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
+        });
         
         btnSendCode.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
