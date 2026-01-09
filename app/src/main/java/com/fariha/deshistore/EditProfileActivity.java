@@ -102,14 +102,14 @@ public class EditProfileActivity extends AppCompatActivity {
                     String gender = dataSnapshot.child("gender").getValue(String.class);
                     String city = dataSnapshot.child("city").getValue(String.class);
                     
-                    etFullName.setText(fullName);
-                    etEmail.setText(email);
-                    etPhoneNumber.setText(phoneNumber);
-                    etDateOfBirth.setText(dateOfBirth);
-                    etCity.setText(city);
+                    if (fullName != null && !fullName.isEmpty()) etFullName.setText(fullName);
+                    if (email != null && !email.isEmpty()) etEmail.setText(email);
+                    if (phoneNumber != null && !phoneNumber.isEmpty()) etPhoneNumber.setText(phoneNumber);
+                    if (dateOfBirth != null && !dateOfBirth.isEmpty()) etDateOfBirth.setText(dateOfBirth);
+                    if (city != null && !city.isEmpty()) etCity.setText(city);
                     
                     // Set gender spinner
-                    if (gender != null) {
+                    if (gender != null && !gender.isEmpty()) {
                         String[] genders = {"Male", "Female", "Other"};
                         for (int i = 0; i < genders.length; i++) {
                             if (genders[i].equals(gender)) {

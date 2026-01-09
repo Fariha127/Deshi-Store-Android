@@ -137,26 +137,39 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void verifyAndLoginUser(String userId, String expectedLoginType) {
-        mDatabase.child("users").child(userId).child("userType").get()
+        // Add timeout handler
+        new android.os.Handler().postDelayed(() -> {
+            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            finish();
+        }, 5000); // 5 second timeout
+        
+        mDatabase.child("users").child(userId).get()
                 .addOnSuccessListener(snapshot -> {
-                    String userType = snapshot.getValue(String.class);
-                    // If userType is null or empty, treat as "User" for backward compatibility
-                    if (userType == null || userType.isEmpty()) {
-                        userType = "User";
-                    }
-                    
-                    if (userType.equals(expectedLoginType)) {
-                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(this, HomeActivity.class));
-                        finish();
+                    if (snapshot.exists()) {
+                        String userType = snapshot.child("userType").getValue(String.class);
+                        
+                        // If userType is null or empty, treat as "User" for backward compatibility
+                        if (userType == null || userType.isEmpty()) {
+                            userType = "User";
+                        }
+                        
+                        if (userType.equals(expectedLoginType)) {
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Invalid login type for this account", Toast.LENGTH_SHORT).show();
+                            mAuth.signOut();
+                        }
                     } else {
-                        Toast.makeText(this, "Invalid login type for this account", Toast.LENGTH_SHORT).show();
-                        mAuth.signOut();
+                        // Still navigate to home since they are authenticated
+                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                        finish();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error verifying user type", Toast.LENGTH_SHORT).show();
-                    mAuth.signOut();
+                    // Still navigate to home since they are authenticated
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    finish();
                 });
     }
 }
