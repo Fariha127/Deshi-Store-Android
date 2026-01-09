@@ -23,6 +23,7 @@ public class FavouriteCategoriesActivity extends AppCompatActivity {
     private List<Category> categoryList;
     private List<Category> favoriteCategories;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
+    private Button btnLogin, btnSignUp;
     private static final String PREFS_NAME = "FavoritesPrefs";
     private static final String FAVORITE_CATEGORIES_KEY = "favorite_categories";
 
@@ -44,6 +45,8 @@ public class FavouriteCategoriesActivity extends AppCompatActivity {
         btnNewlyAdded = findViewById(R.id.btnNewlyAdded);
         btnMyFavourites = findViewById(R.id.btnMyFavourites);
         btnFavouriteCategories = findViewById(R.id.btnFavouriteCategories);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnSignUp = findViewById(R.id.btnSignUp);
         
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -79,6 +82,14 @@ public class FavouriteCategoriesActivity extends AppCompatActivity {
 
         btnFavouriteCategories.setOnClickListener(v -> {
             // Already on Favourite Categories
+        });
+
+        btnLogin.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
+        });
+
+        btnSignUp.setOnClickListener(v -> {
+            startActivity(new Intent(this, UserSignUpActivity.class));
         });
     }
 

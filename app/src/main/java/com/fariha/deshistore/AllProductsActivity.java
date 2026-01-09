@@ -18,6 +18,7 @@ public class AllProductsActivity extends AppCompatActivity {
     private ProductAdapter productAdapter;
     private List<Product> productList;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
+    private Button btnLogin, btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,8 @@ public class AllProductsActivity extends AppCompatActivity {
         btnNewlyAdded = findViewById(R.id.btnNewlyAdded);
         btnMyFavourites = findViewById(R.id.btnMyFavourites);
         btnFavouriteCategories = findViewById(R.id.btnFavouriteCategories);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnSignUp = findViewById(R.id.btnSignUp);
         
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -73,6 +76,14 @@ public class AllProductsActivity extends AppCompatActivity {
         btnFavouriteCategories.setOnClickListener(v -> {
             startActivity(new Intent(this, FavouriteCategoriesActivity.class));
             finish();
+        });
+
+        btnLogin.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
+        });
+
+        btnSignUp.setOnClickListener(v -> {
+            startActivity(new Intent(this, UserSignUpActivity.class));
         });
     }
 

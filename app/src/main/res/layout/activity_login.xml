@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/green"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:text="Deshi Store"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <!-- Login Type Dropdown -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Login as:"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinnerLoginType"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/spinner_border"
+            android:padding="12dp" />
+
+        <!-- Email Field -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Email:"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            android:hint="Enter your email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <!-- Password Field -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Password:"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            android:hint="Enter your password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textSize="14sp"
+            android:drawableEnd="@android:drawable/ic_menu_view" />
+
+        <!-- Login Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/orange" />
+
+        <!-- Don't have account text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Don't have an account?"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <!-- Sign up links -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvSignUpCompanyVendor"
+                android:layout_width="147dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Signup as Company Vendor"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSignUpRetailVendor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Signup as Retail Vendor"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:padding="8dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSignUpUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Signup as User"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:padding="8dp" />
+
+        <!-- Back to Home Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBackToHome"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="32dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Back to Home"
+            android:textAllCaps="false"
+            android:textColor="@color/green"
+            android:textSize="16sp"
+            app:backgroundTint="@color/white" />
+
+    </LinearLayout>
+</ScrollView>

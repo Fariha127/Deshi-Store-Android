@@ -1,5 +1,6 @@
 package com.fariha.deshistore;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -261,8 +263,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 }
                 
                 // Change button to active state
-                btnRecommend.setBackgroundResource(R.drawable.button_recommend_active);
-                btnRecommend.setTextColor(getResources().getColor(android.R.color.white));
+                btnRecommend.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.green)));
+                btnRecommend.setTextColor(ContextCompat.getColor(this, R.color.white));
                 
                 Toast.makeText(this, "Product recommended!", Toast.LENGTH_SHORT).show();
             } else {
@@ -276,8 +278,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 }
                 
                 // Change button back to inactive state
-                btnRecommend.setBackgroundResource(R.drawable.button_recommend);
-                btnRecommend.setTextColor(getResources().getColor(R.color.green));
+                btnRecommend.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+                btnRecommend.setTextColor(ContextCompat.getColor(this, R.color.green));
                 
                 Toast.makeText(this, "Recommendation removed", Toast.LENGTH_SHORT).show();
             }
@@ -303,12 +305,12 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private void updateFavoriteButton() {
         if (isFavorite) {
-            btnFavourite.setBackgroundResource(R.drawable.button_favourite_active);
-            btnFavourite.setTextColor(getResources().getColor(R.color.white));
+            btnFavourite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.red)));
+            btnFavourite.setTextColor(ContextCompat.getColor(this, R.color.white));
             btnFavourite.setText("♥ Favourite");
         } else {
-            btnFavourite.setBackgroundResource(R.drawable.button_favourite_border);
-            btnFavourite.setTextColor(getResources().getColor(R.color.red));
+            btnFavourite.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+            btnFavourite.setTextColor(ContextCompat.getColor(this, R.color.red));
             btnFavourite.setText("♡ Favourite");
         }
     }

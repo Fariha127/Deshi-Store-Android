@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/green"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Retail Vendor Registration"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="For Retail Shops &amp; Stores"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Shop Owner Name: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etOwnerName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter owner's full name"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Shop/Store Name: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etShopName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="e.g., Swapno - Dhanmondi Branch"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Email: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter email address"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Password: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Confirm Password: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Confirm password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Phone Number: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="e.g., 01712345678"
+            android:inputType="phone"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Business Registration Number:"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etRegistrationNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter registration number"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Trade License Number:"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etTradeLicense"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter trade license number"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Shop Address: *"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etShopAddress"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:gravity="top|start"
+            android:hint="Enter full shop address"
+            android:inputType="textMultiLine"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="TIN Number:"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etTINNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/white"
+            android:hint="Enter TIN number"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:text="Register"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/orange" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBackToLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Back to Login"
+            android:textAllCaps="false"
+            android:textColor="@color/green"
+            android:textSize="16sp"
+            app:backgroundTint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="* Required fields"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -349,30 +349,30 @@
                         android:layout_marginTop="16dp"
                         android:orientation="horizontal">
 
-                        <Button
+                        <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/btnRecommend"
                             android:layout_width="0dp"
-                            android:layout_height="48dp"
+                            android:layout_height="56dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:background="@drawable/button_recommend"
-                            android:text="👍 Recommend"
+                            android:text="Recommend"
                             android:textAllCaps="false"
                             android:textColor="@color/green"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/white" />
 
-                        <Button
+                        <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/btnFavourite"
                             android:layout_width="0dp"
-                            android:layout_height="48dp"
+                            android:layout_height="56dp"
                             android:layout_weight="1"
-                            android:background="@drawable/button_favourite_border"
                             android:text="♡ Favourite"
                             android:textAllCaps="false"
                             android:textColor="@color/red"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@color/white" />
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -419,7 +419,7 @@
                             android:layout_width="100dp"
                             android:layout_height="40dp"
                             android:layout_marginStart="12dp"
-                            android:background="@android:color/white"
+                            android:background="@drawable/spinner_border"
                             android:padding="8dp"
                             android:spinnerMode="dropdown" />
 
@@ -453,19 +453,19 @@
                         android:textSize="14sp" />
 
                     <!-- Submit Button -->
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnSubmitReview"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:layout_marginTop="16dp"
-                        android:background="#4CAF50"
                         android:paddingStart="32dp"
                         android:paddingEnd="32dp"
                         android:text="Submit Review"
                         android:textAllCaps="false"
-                        android:textColor="@android:color/white"
+                        android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/green" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

@@ -256,15 +256,11 @@ public class HomeActivity extends AppCompatActivity {
 
         // Auth buttons
         btnLogin.setOnClickListener(v -> {
-            // Navigate to Login
-            Toast.makeText(this, "Login", Toast.LENGTH_SHORT).show();
-            // Intent to LoginActivity
+            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
         });
 
         btnSignUp.setOnClickListener(v -> {
-            // Navigate to Sign Up
-            Toast.makeText(this, "Sign Up", Toast.LENGTH_SHORT).show();
-            // Intent to SignUpActivity
+            startActivity(new Intent(HomeActivity.this, UserSignUpActivity.class));
         });
 
         // View All

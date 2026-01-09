@@ -11,6 +11,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        // Initialize Firebase and create manufacturer accounts (runs once)
+        FirebaseInitializer firebaseInitializer = new FirebaseInitializer(this);
+        firebaseInitializer.createManufacturerAccounts();
+        
         // Navigate to HomeActivity
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(intent);
