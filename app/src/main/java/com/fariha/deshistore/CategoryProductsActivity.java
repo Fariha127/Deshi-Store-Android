@@ -2,7 +2,9 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,6 +20,7 @@ public class CategoryProductsActivity extends AppCompatActivity {
     private List<Product> productList;
     private String categoryId;
     private String categoryName;
+    private TextView tvCategoryTitle;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
 
     @Override
@@ -36,12 +39,37 @@ public class CategoryProductsActivity extends AppCompatActivity {
 
     private void initializeViews() {
         rvProducts = findViewById(R.id.rvProducts);
+        tvCategoryTitle = findViewById(R.id.tvCategoryTitle);
         btnHome = findViewById(R.id.btnHome);
         btnAllProducts = findViewById(R.id.btnAllProducts);
         btnProductCategories = findViewById(R.id.btnProductCategories);
         btnNewlyAdded = findViewById(R.id.btnNewlyAdded);
         btnMyFavourites = findViewById(R.id.btnMyFavourites);
         btnFavouriteCategories = findViewById(R.id.btnFavouriteCategories);
+        
+        // Show category title
+        tvCategoryTitle.setText(categoryName);
+        tvCategoryTitle.setVisibility(View.VISIBLE);
+        
+        // Highlight Product Categories button with white text
+        btnProductCategories.setBackgroundResource(R.drawable.button_green);
+        btnProductCategories.setTextColor(getResources().getColor(android.R.color.white));
+        
+        // Set other buttons to white background with gray text
+        btnHome.setBackgroundResource(R.drawable.button_white);
+        btnHome.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        
+        btnAllProducts.setBackgroundResource(R.drawable.button_white);
+        btnAllProducts.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        
+        btnNewlyAdded.setBackgroundResource(R.drawable.button_white);
+        btnNewlyAdded.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        
+        btnMyFavourites.setBackgroundResource(R.drawable.button_white);
+        btnMyFavourites.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        
+        btnFavouriteCategories.setBackgroundResource(R.drawable.button_white);
+        btnFavouriteCategories.setTextColor(getResources().getColor(android.R.color.darker_gray));
         
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
