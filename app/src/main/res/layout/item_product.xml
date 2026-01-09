@@ -77,35 +77,31 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageButton
+            <!-- Favorite Button -->
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnFavorite"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/btn_star_big_off"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_favorite"
+                android:text="♡"
+                android:textColor="#E91E63"
+                android:textSize="24sp"
                 android:contentDescription="Add to favorites" />
 
-            <TextView
-                android:id="@+id/tvRecommendCount"
+            <!-- Rate Button -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnRate"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="0 Recommends"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnViewDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:background="#4CAF50"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="View Details"
+                android:background="@drawable/button_orange"
+                android:text="☆ Rate"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textSize="14sp"
+                android:contentDescription="Rate product" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

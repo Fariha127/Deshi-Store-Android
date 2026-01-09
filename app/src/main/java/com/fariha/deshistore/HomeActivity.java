@@ -9,7 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class HomeActivity extends AppCompatActivity {
 
         productList.add(new Product(
                 "2",
-                "Mediplus DS",
+                "MediPlus DS",
                 "Toothpaste",
                 85.0,
                 "100g",
@@ -97,11 +97,119 @@ public class HomeActivity extends AppCompatActivity {
                 0,
                 false
         ));
+
+        productList.add(new Product(
+                "4",
+                "Meril Milk Soap",
+                "Moisturizing Soap",
+                35.0,
+                "75g",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "5",
+                "Shezan Mango Juice",
+                "Mango Juice",
+                120.0,
+                "1L",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "6",
+                "Pran Potata Spicy",
+                "Biscuit",
+                40.0,
+                "200g",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "7",
+                "Ruchi BBQ Chanachur",
+                "Snack",
+                30.0,
+                "150g",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "8",
+                "Bashundhara Towel",
+                "Hand Towel",
+                80.0,
+                "pack",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "9",
+                "Revive Perfect Skin",
+                "Moisturizing Lotion",
+                150.0,
+                "100ml",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "10",
+                "Jui HairCare Oil",
+                "Hair Oil",
+                95.0,
+                "200ml",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "11",
+                "Radhuni Turmeric",
+                "Powder",
+                55.0,
+                "100g",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
+
+        productList.add(new Product(
+                "12",
+                "Pran Premium Ghee",
+                "Cooking Ghee",
+                250.0,
+                "500g",
+                "",
+                "Sample Manufacturer",
+                0,
+                false
+        ));
     }
 
     private void setupRecyclerView() {
         productAdapter = new ProductAdapter(this, productList);
-        rvProducts.setLayoutManager(new LinearLayoutManager(this));
+        rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
         rvProducts.setAdapter(productAdapter);
     }
 
