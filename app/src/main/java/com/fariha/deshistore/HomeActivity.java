@@ -22,7 +22,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private EditText etSearch;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
-    private Button btnLogin, btnSignUp;
+    private Button btnLogin, btnSignUp, btnProfile;
     private TextView tvViewAll;
     private RecyclerView rvProducts;
 
@@ -55,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
         // Auth buttons
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
+        btnProfile = findViewById(R.id.btnProfile);
 
         // Other views
         tvViewAll = findViewById(R.id.tvViewAll);
@@ -67,9 +68,10 @@ public class HomeActivity extends AppCompatActivity {
     private void checkLoginStatus() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            // User is logged in, hide auth buttons
+            // User is logged in, hide auth buttons and show profile button
             btnLogin.setVisibility(View.GONE);
             btnSignUp.setVisibility(View.GONE);
+            btnProfile.setVisibility(View.VISIBLE);
         }
     }
 
@@ -277,6 +279,11 @@ public class HomeActivity extends AppCompatActivity {
 
         btnSignUp.setOnClickListener(v -> {
             startActivity(new Intent(HomeActivity.this, UserSignUpActivity.class));
+        });
+        
+        // Profile button
+        btnProfile.setOnClickListener(v -> {
+            startActivity(new Intent(HomeActivity.this, MyProfileActivity.class));
         });
 
         // View All

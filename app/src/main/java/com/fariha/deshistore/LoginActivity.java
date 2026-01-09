@@ -140,7 +140,12 @@ public class LoginActivity extends AppCompatActivity {
         mDatabase.child("users").child(userId).child("userType").get()
                 .addOnSuccessListener(snapshot -> {
                     String userType = snapshot.getValue(String.class);
-                    if (userType != null && userType.equals(expectedLoginType)) {
+                    // If userType is null or empty, treat as "User" for backward compatibility
+                    if (userType == null || userType.isEmpty()) {
+                        userType = "User";
+                    }
+                    
+                    if (userType.equals(expectedLoginType)) {
                         Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(this, HomeActivity.class));
                         finish();
