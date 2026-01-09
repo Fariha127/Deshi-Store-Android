@@ -14,6 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +46,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         holder.tvCategoryName.setText(category.getName());
         holder.tvCategoryDescription.setText(category.getDescription());
+
+        // Load category image
+        if (category.getImageUrl() != null && !category.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(category.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.ivCategoryImage);
+        } else {
+            holder.ivCategoryImage.setImageResource(R.drawable.ic_launcher_background);
+        }
 
         // Check if category is in favorites
         boolean isFavorite = isFavoriteCategory(category.getId());

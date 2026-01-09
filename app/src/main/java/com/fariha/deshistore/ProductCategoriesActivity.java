@@ -55,15 +55,26 @@ public class ProductCategoriesActivity extends AppCompatActivity {
     private void setupCategoryList() {
         categoryList = new ArrayList<>();
         
-        categoryList.add(new Category("1", "Beverages", "Energy Drinks, Soft Drinks, Juices", ""));
-        categoryList.add(new Category("2", "Hair Care", "Hair Shampoo, Hair Oil", ""));
-        categoryList.add(new Category("3", "Oral Care", "Toothpaste, Mouthwash", ""));
-        categoryList.add(new Category("4", "Snacks", "Biscuits, Chips, Chanachur", ""));
-        categoryList.add(new Category("5", "Food & Grocery", "Rice, Spices, Ready Mixes, Sauces, Mustard Oils, Rice Bran Oils, ...", ""));
-        categoryList.add(new Category("6", "Home Care", "Cleaners, Handwash, Detergent, Hand Towel, Mosquito repellents, ...", ""));
-        categoryList.add(new Category("7", "Skin Care", "Body Soap, Moisterizer, Body Lotion, Face Cleanser, Lip Care", ""));
-        categoryList.add(new Category("8", "Baby Care", "Diapers, Baby Care products", ""));
-        categoryList.add(new Category("9", "Dairy Products", "Milk, Milk Powder, Ghee, Yoghurt, Condensed Milk", ""));
+        // Sample categories with actual category images from images folder
+        // Images loaded from GitHub repository
+        categoryList.add(new Category("1", "Beverages", "Energy Drinks, Soft Drinks, Juices", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/beverages-category.jpg"));
+        categoryList.add(new Category("2", "Hair Care", "Hair Shampoo, Hair Oil", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/haircare-category.jpg"));
+        categoryList.add(new Category("3", "Oral Care", "Toothpaste, Mouthwash", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/oralcare-category.jpg"));
+        categoryList.add(new Category("4", "Snacks", "Biscuits, Chips, Chanachur", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/snacks-category.jpg"));
+        categoryList.add(new Category("5", "Food & Grocery", "Rice, Spices, Ready Mixes, Sauces, Mustard Oils, Rice Bran Oils, ...", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/foodgrocery-category.jpg"));
+        categoryList.add(new Category("6", "Home Care", "Cleaners, Handwash, Detergent, Hand Towel, Mosquito repellents, ...", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/homecare-category.jpg"));
+        categoryList.add(new Category("7", "Skin Care", "Body Soap, Moisterizer, Body Lotion, Face Cleanser, Lip Care", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/skincare-category.jpg"));
+        categoryList.add(new Category("8", "Baby Care", "Diapers, Baby Care products", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/babycare-category.jpg"));
+        categoryList.add(new Category("9", "Dairy Products", "Milk, Milk Powder, Ghee, Yoghurt, Condensed Milk", 
+            "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/dairy-category.jpg"));
     }
 
     private void setupRecyclerView() {

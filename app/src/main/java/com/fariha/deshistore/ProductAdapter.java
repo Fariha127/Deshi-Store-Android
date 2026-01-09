@@ -14,6 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -61,8 +64,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         // Load image if URL is provided
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            // Use image loading library like Glide or Picasso
-            // Glide.with(context).load(product.getImageUrl()).into(holder.ivProductImage);
+            Glide.with(context)
+                    .load(product.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.ivProductImage);
+        } else {
+            holder.ivProductImage.setImageResource(R.drawable.ic_launcher_background);
         }
 
         // Favorite button click

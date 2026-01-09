@@ -61,14 +61,15 @@ public class HomeActivity extends AppCompatActivity {
     private void setupProductList() {
         productList = new ArrayList<>();
         
-        // Sample data - Replace with actual data from Firebase/Database
+        // Sample data with actual product images from images folder
+        // Images loaded from GitHub repository
         productList.add(new Product(
                 "1",
                 "Mojo",
                 "Soft Drink",
                 25.0,
                 "250ml",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg",
                 "Akij Food & Beverage Ltd. (AFBL)",
                 0,
                 false
@@ -80,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Toothpaste",
                 85.0,
                 "100g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mediplus.jpg",
                 "Anfords Bangladesh Ltd.",
                 0,
                 false
@@ -92,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Water",
                 20.0,
                 "500ml",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/spa-water.jpg",
                 "Akij Food & Beverage Ltd. (AFBL)",
                 0,
                 false
@@ -104,7 +105,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Moisturizing Soap",
                 35.0,
                 "75g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/meril-soap.jpg",
                 "Square Toiletries Ltd.",
                 0,
                 false
@@ -116,7 +117,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Mango Juice",
                 120.0,
                 "1L",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/shezan-juice.jpg",
                 "Sajeeb Group",
                 0,
                 false
@@ -128,7 +129,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Biscuit",
                 40.0,
                 "200g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-potata.jpg",
                 "Pran Foods Ltd.",
                 0,
                 false
@@ -140,7 +141,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Snack",
                 30.0,
                 "150g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/ruchi-chanachur.jpg",
                 "Pran Foods Ltd.",
                 0,
                 false
@@ -152,7 +153,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Hand Towel",
                 80.0,
                 "pack",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/bashundhara-towel.jpg",
                 "Bashundhara Paper Mills PLC",
                 0,
                 false
@@ -164,7 +165,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Moisturizing Lotion",
                 150.0,
                 "100ml",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/revive-lotion.jpg",
                 "Square Toiletries Ltd.",
                 0,
                 false
@@ -176,7 +177,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Hair Oil",
                 95.0,
                 "200ml",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/jui-oil.jpg",
                 "Square Toiletries Ltd.",
                 0,
                 false
@@ -188,7 +189,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Powder",
                 55.0,
                 "100g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/radhuni-tumeric.jpg",
                 "Square Food & Beverage Ltd.",
                 0,
                 false
@@ -200,7 +201,7 @@ public class HomeActivity extends AppCompatActivity {
                 "Cooking Ghee",
                 250.0,
                 "500g",
-                "",
+                "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-ghee.jpg",
                 "Pran Dairy Ltd.",
                 0,
                 false

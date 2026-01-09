@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Image URL Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .preview img {
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Product Image URL Generator</h1>
+        <p>Generate placeholder or real image URLs for your Deshi Store products</p>
+
+        <div class="section">
+            <h2>Option 1: Placeholder Images</h2>
+            <input type="text" id="productName" placeholder="Enter product name (e.g., Mojo)">
+            <select id="imageSize">
+                <option value="300x300">300x300 (Product)</option>
+                <option value="300x200">300x200 (Category)</option>
+                <option value="400x400">400x400 (High Quality)</option>
+            </select>
+            <button onclick="generatePlaceholder()">Generate Placeholder URL</button>
+        </div>
+
+        <div class="section">
+            <h2>Option 2: Unsplash Images</h2>
+            <input type="text" id="searchTerm" placeholder="Search term (e.g., beverage, food, soap)">
+            <button onclick="generateUnsplash()">Generate Unsplash URL</button>
+        </div>
+
+        <div class="section">
+            <h2>Option 3: Custom URL</h2>
+            <input type="text" id="customUrl" placeholder="Paste your image URL here">
+            <button onclick="useCustomUrl()">Use Custom URL</button>
+        </div>
+
+        <div id="output" class="output" style="display: none;">
+            <strong>Your Image URL:</strong>
+            <div id="urlOutput"></div>
+            <button onclick="copyToClipboard()">📋 Copy URL</button>
+        </div>
+
+        <div id="preview" class="preview" style="display: none;">
+            <strong>Preview:</strong><br>
+            <img id="previewImg" src="" alt="Preview">
+        </div>
+
+        <div class="section">
+            <h2>📚 Quick Reference</h2>
+            <p><strong>Free Image Sources:</strong></p>
+            <ul>
+                <li><strong>Placeholder.com:</strong> https://via.placeholder.com/300x300.png?text=YourText</li>
+                <li><strong>Unsplash:</strong> https://source.unsplash.com/300x300/?product</li>
+                <li><strong>Imgur:</strong> Upload at imgur.com and get direct link</li>
+                <li><strong>Picsum:</strong> https://picsum.photos/300/300</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentUrl = '';
+
+        function generatePlaceholder() {
+            const name = document.getElementById('productName').value || 'Product';
+            const size = document.getElementById('imageSize').value;
+            const encodedName = encodeURIComponent(name);
+            currentUrl = `https://via.placeholder.com/${size}.png?text=${encodedName}`;
+            showOutput();
+        }
+
+        function generateUnsplash() {
+            const term = document.getElementById('searchTerm').value || 'product';
+            const size = document.getElementById('imageSize').value;
+            currentUrl = `https://source.unsplash.com/${size}/?${term}`;
+            showOutput();
+        }
+
+        function useCustomUrl() {
+            currentUrl = document.getElementById('customUrl').value;
+            if (currentUrl) {
+                showOutput();
+            } else {
+                alert('Please enter a URL');
+            }
+        }
+
+        function showOutput() {
+            document.getElementById('output').style.display = 'block';
+            document.getElementById('urlOutput').textContent = currentUrl;
+            document.getElementById('preview').style.display = 'block';
+            document.getElementById('previewImg').src = currentUrl;
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(currentUrl).then(() => {
+                alert('URL copied to clipboard! ✅');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = currentUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('URL copied to clipboard! ✅');
+            });
+        }
+    </script>
+</body>
+</html>
