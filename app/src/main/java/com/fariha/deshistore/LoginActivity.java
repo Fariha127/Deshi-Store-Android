@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(this, HomeActivity.class));
                 finish();
             } else {
-                Toast.makeText(this, "Invalid admin credentials", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Incorrect email or password!", Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -131,8 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                             verifyAndLoginUser(user.getUid(), loginType);
                         }
                     } else {
-                        Toast.makeText(LoginActivity.this, "Authentication failed: " + 
-                                task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Incorrect email or password!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

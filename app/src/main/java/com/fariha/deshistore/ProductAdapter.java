@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,8 +55,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         // Check if product is in favorites
         boolean isFavorite = isFavoriteProduct(product.getId());
         
-        // Update favorite button appearance
-        if (isFavorite) {
+        // Check if user is logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        boolean isLoggedIn = (currentUser != null);
+        
+        // Update favorite button appearance - only show filled heart if logged in and favorited
+        if (isLoggedIn && isFavorite) {
             holder.btnFavorite.setText("♥");
             holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         } else {
@@ -76,6 +82,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         // Favorite button click
         holder.btnFavorite.setOnClickListener(v -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                Toast.makeText(context, "Please log in first to add favorites", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             if (isFavoriteProduct(product.getId())) {
                 removeFavorite(product.getId());
                 holder.btnFavorite.setText("♡");

@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashSet;
 import java.util.List;
@@ -62,8 +64,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         // Check if category is in favorites
         boolean isFavorite = isFavoriteCategory(category.getId());
         
-        // Update favorite button appearance
-        if (isFavorite) {
+        // Check if user is logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        boolean isLoggedIn = (currentUser != null);
+        
+        // Update favorite button appearance - only show filled heart if logged in and favorited
+        if (isLoggedIn && isFavorite) {
             holder.btnFavorite.setText("♥");
             holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         } else {
@@ -73,6 +79,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         // Favorite button click
         holder.btnFavorite.setOnClickListener(v -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                Toast.makeText(context, "Please log in first to add favorites", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             if (isFavoriteCategory(category.getId())) {
                 removeFavoriteCategory(category.getId());
                 holder.btnFavorite.setText("♡");
@@ -88,6 +100,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         // View button click
         holder.btnView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, CategoryProductsActivity.class);
+            intent.putExtra("category_id", category.getId());
+            intent.putExtra("category_name", category.getName());
+            context.startActivity(intent);
+        });
+        
+        // Card click - also navigate to category products
+        holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, CategoryProductsActivity.class);
             intent.putExtra("category_id", category.getId());
             intent.putExtra("category_name", category.getName());

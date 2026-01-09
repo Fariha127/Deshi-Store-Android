@@ -109,6 +109,15 @@ public class MyFavouritesActivity extends AppCompatActivity {
     }
 
     private void setupProductList() {
+        // Check if user is logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // Show message that user needs to log in
+            Toast.makeText(this, "Please log in to view your favorite products", Toast.LENGTH_LONG).show();
+            favoriteProducts = new ArrayList<>();
+            return;
+        }
+        
         // Initialize all products list with images (same as HomeActivity)
         productList = new ArrayList<>();
         

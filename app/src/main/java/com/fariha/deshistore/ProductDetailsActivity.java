@@ -1,5 +1,6 @@
 package com.fariha.deshistore;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
@@ -282,6 +283,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         // Recommend button - toggle functionality
         btnRecommend.setOnClickListener(v -> {
+            // Check if user is logged in
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                Toast.makeText(this, "Please log in first to recommend products", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             if (!hasRecommended) {
                 // Recommend the product
                 product.incrementRecommendCount();
@@ -316,6 +324,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         // Favourite button
         btnFavourite.setOnClickListener(v -> {
+            // Check if user is logged in
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                Toast.makeText(this, "Please log in first to add favorites", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             isFavorite = !isFavorite;
             updateFavoriteButton();
             
@@ -344,6 +359,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
     }
 
     private void submitReview() {
+        // Check if user is logged in
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Please log in first to submit a review", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         String reviewText = etReview.getText().toString().trim();
         
         if (reviewText.isEmpty()) {

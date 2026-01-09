@@ -108,6 +108,16 @@ public class FavouriteCategoriesActivity extends AppCompatActivity {
     }
 
     private void setupCategoryList() {
+        // Check if user is logged in
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // Show message that user needs to log in
+            Toast.makeText(this, "Please log in to view your favorite categories", Toast.LENGTH_LONG).show();
+            favoriteCategories = new ArrayList<>();
+            setupRecyclerView();
+            return;
+        }
+        
         categoryList = new ArrayList<>();
         
         // Initialize all 9 categories with images

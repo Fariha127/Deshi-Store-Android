@@ -235,7 +235,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="350dp"
                         android:layout_gravity="center"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
                         android:background="#F0F0F0"
                         android:contentDescription="Product Image"
                         android:src="@android:drawable/ic_menu_gallery" />
