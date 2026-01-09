@@ -229,15 +229,37 @@
                     android:orientation="vertical"
                     android:padding="24dp">
 
+                    <!-- Product Image -->
+                    <ImageView
+                        android:id="@+id/ivProductImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:scaleType="centerCrop"
+                        android:background="#F0F0F0"
+                        android:contentDescription="Product Image"
+                        android:src="@android:drawable/ic_menu_gallery" />
+
                     <!-- Product Name -->
                     <TextView
                         android:id="@+id/tvProductName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:text="Mojo"
                         android:textColor="#333333"
                         android:textSize="24sp"
                         android:textStyle="bold" />
+
+                    <!-- Manufacturer -->
+                    <TextView
+                        android:id="@+id/tvManufacturer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Akij Food &amp; Beverage Ltd. (AFBL)"
+                        android:textColor="#666666"
+                        android:textSize="14sp" />
 
                     <!-- Category Badge -->
                     <TextView
@@ -333,12 +355,10 @@
                             android:layout_height="48dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:background="#FF6F00"
-                            android:drawableStart="@android:drawable/ic_input_add"
-                            android:drawableTint="@android:color/white"
-                            android:text="Recommend"
+                            android:background="@drawable/button_recommend"
+                            android:text="👍 Recommend"
                             android:textAllCaps="false"
-                            android:textColor="@android:color/white"
+                            android:textColor="#4CAF50"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -347,10 +367,8 @@
                             android:layout_width="0dp"
                             android:layout_height="48dp"
                             android:layout_weight="1"
-                            android:background="@android:color/white"
-                            android:drawableStart="@android:drawable/btn_star_big_off"
-                            android:drawableTint="#E91E63"
-                            android:text="Favourite"
+                            android:background="@drawable/button_favourite_border"
+                            android:text="♡ Favourite"
                             android:textAllCaps="false"
                             android:textColor="#E91E63"
                             android:textSize="14sp"

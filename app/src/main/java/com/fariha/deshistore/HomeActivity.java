@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity {
                 25.0,
                 "250ml",
                 "",
-                "Sample Manufacturer",
+                "Akij Food & Beverage Ltd. (AFBL)",
                 0,
                 false
         ));
@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
                 85.0,
                 "100g",
                 "",
-                "Sample Manufacturer",
+                "Anfords Bangladesh Ltd.",
                 0,
                 false
         ));
@@ -93,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
                 20.0,
                 "500ml",
                 "",
-                "Sample Manufacturer",
+                "Akij Food & Beverage Ltd. (AFBL)",
                 0,
                 false
         ));
@@ -105,7 +105,7 @@ public class HomeActivity extends AppCompatActivity {
                 35.0,
                 "75g",
                 "",
-                "Sample Manufacturer",
+                "Square Toiletries Ltd.",
                 0,
                 false
         ));
@@ -117,7 +117,7 @@ public class HomeActivity extends AppCompatActivity {
                 120.0,
                 "1L",
                 "",
-                "Sample Manufacturer",
+                "Sajeeb Group",
                 0,
                 false
         ));
@@ -129,7 +129,7 @@ public class HomeActivity extends AppCompatActivity {
                 40.0,
                 "200g",
                 "",
-                "Sample Manufacturer",
+                "Pran Foods Ltd.",
                 0,
                 false
         ));
@@ -141,7 +141,7 @@ public class HomeActivity extends AppCompatActivity {
                 30.0,
                 "150g",
                 "",
-                "Sample Manufacturer",
+                "Pran Foods Ltd.",
                 0,
                 false
         ));
@@ -153,7 +153,7 @@ public class HomeActivity extends AppCompatActivity {
                 80.0,
                 "pack",
                 "",
-                "Sample Manufacturer",
+                "Bashundhara Paper Mills PLC",
                 0,
                 false
         ));
@@ -165,7 +165,7 @@ public class HomeActivity extends AppCompatActivity {
                 150.0,
                 "100ml",
                 "",
-                "Sample Manufacturer",
+                "Square Toiletries Ltd.",
                 0,
                 false
         ));
@@ -177,7 +177,7 @@ public class HomeActivity extends AppCompatActivity {
                 95.0,
                 "200ml",
                 "",
-                "Sample Manufacturer",
+                "Square Toiletries Ltd.",
                 0,
                 false
         ));
@@ -189,7 +189,7 @@ public class HomeActivity extends AppCompatActivity {
                 55.0,
                 "100g",
                 "",
-                "Sample Manufacturer",
+                "Square Food & Beverage Ltd.",
                 0,
                 false
         ));
@@ -201,7 +201,7 @@ public class HomeActivity extends AppCompatActivity {
                 250.0,
                 "500g",
                 "",
-                "Sample Manufacturer",
+                "Pran Dairy Ltd.",
                 0,
                 false
         ));

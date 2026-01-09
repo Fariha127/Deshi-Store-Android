@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,7 +24,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private Button btnBack, btnHome, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
     private Button btnLogin, btnSignUp, btnRecommend, btnFavourite, btnSubmitReview;
-    private TextView tvProductName, tvCategoryBadge, tvSubcategory, tvPrice;
+    private ImageView ivProductImage;
+    private TextView tvProductName, tvManufacturer, tvCategoryBadge, tvSubcategory, tvPrice;
     private TextView tvRecommendations, tvRating, tvReviewCount;
     private Spinner spinnerRating;
     private EditText etReview;
@@ -61,7 +63,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
         btnSignUp = findViewById(R.id.btnSignUp);
 
         // Product info
+        ivProductImage = findViewById(R.id.ivProductImage);
         tvProductName = findViewById(R.id.tvProductName);
+        tvManufacturer = findViewById(R.id.tvManufacturer);
         tvCategoryBadge = findViewById(R.id.tvCategoryBadge);
         tvSubcategory = findViewById(R.id.tvSubcategory);
         tvPrice = findViewById(R.id.tvPrice);
@@ -90,13 +94,14 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 25.0,
                 "250ml",
                 "",
-                "Sample Manufacturer",
+                "Akij Food & Beverage Ltd. (AFBL)",
                 16,
                 false
         );
 
         // Display product info
         tvProductName.setText(product.getName());
+        tvManufacturer.setText(product.getManufacturer());
         tvCategoryBadge.setText(product.getCategory());
         tvSubcategory.setText("Soft Drink"); // TODO: Add subcategory to Product model
         tvPrice.setText(String.format(Locale.getDefault(), "৳ %.0f/%s", 
@@ -197,6 +202,11 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 product.incrementRecommendCount();
                 hasRecommended = true;
                 tvRecommendations.setText(product.getRecommendCount() + " Recommendations");
+                
+                // Change button to active state
+                btnRecommend.setBackgroundResource(R.drawable.button_recommend_active);
+                btnRecommend.setTextColor(getResources().getColor(android.R.color.white));
+                
                 Toast.makeText(this, "Product recommended!", Toast.LENGTH_SHORT).show();
                 // TODO: Update in database
             } else {
@@ -214,7 +224,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Removed from favourites", Toast.LENGTH_SHORT).show();
             }
-            // TODO: Update in database
+            // TODO: Update in database and SharedPreferences
         });
 
         // Submit Review button
@@ -223,11 +233,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private void updateFavoriteButton() {
         if (isFavorite) {
-            btnFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                    android.R.drawable.btn_star_big_on, 0, 0, 0);
+            btnFavourite.setBackgroundResource(R.drawable.button_favourite_active);
+            btnFavourite.setTextColor(getResources().getColor(android.R.color.white));
+            btnFavourite.setText("♥ Favourite");
         } else {
-            btnFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                    android.R.drawable.btn_star_big_off, 0, 0, 0);
+            btnFavourite.setBackgroundResource(R.drawable.button_favourite_border);
+            btnFavourite.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            btnFavourite.setText("♡ Favourite");
         }
     }
 
