@@ -1,11 +1,12 @@
 package com.fariha.deshistore;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +14,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     private Context context;
     private List<Product> productList;
+    private static final String PREFS_NAME = "FavoritesPrefs";
+    private static final String FAVORITES_KEY = "favorites";
 
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
@@ -41,13 +46,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvProductCategory.setText(product.getCategory());
         holder.tvProductPrice.setText(String.format(Locale.getDefault(), "৳ %.0f", product.getPrice()));
         holder.tvProductUnit.setText("/" + product.getUnit());
-        holder.tvRecommendCount.setText(product.getRecommendCount() + " Recommends");
 
-        // Update favorite icon
-        if (product.isFavorite()) {
-            holder.btnFavorite.setImageResource(android.R.drawable.btn_star_big_on);
+        // Check if product is in favorites
+        boolean isFavorite = isFavoriteProduct(product.getId());
+        
+        // Update favorite button appearance
+        if (isFavorite) {
+            holder.btnFavorite.setText("♥");
+            holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         } else {
-            holder.btnFavorite.setImageResource(android.R.drawable.btn_star_big_off);
+            holder.btnFavorite.setText("♡");
+            holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
         }
 
         // Load image if URL is provided
@@ -58,20 +67,28 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
         // Favorite button click
         holder.btnFavorite.setOnClickListener(v -> {
-            product.setFavorite(!product.isFavorite());
-            notifyItemChanged(position);
-            
-            if (product.isFavorite()) {
-                Toast.makeText(context, product.getName() + " added to favorites", Toast.LENGTH_SHORT).show();
-            } else {
+            if (isFavoriteProduct(product.getId())) {
+                removeFavorite(product.getId());
+                holder.btnFavorite.setText("♡");
+                holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
                 Toast.makeText(context, product.getName() + " removed from favorites", Toast.LENGTH_SHORT).show();
+            } else {
+                addFavorite(product.getId());
+                holder.btnFavorite.setText("♥");
+                holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+                Toast.makeText(context, product.getName() + " added to favorites", Toast.LENGTH_SHORT).show();
             }
-            // TODO: Update favorite status in database
         });
 
-        // View Details button click
-        holder.btnViewDetails.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(context, ProductDetailsActivity.class);
+        // Rate button click
+        holder.btnRate.setOnClickListener(v -> {
+            Toast.makeText(context, "Rate " + product.getName(), Toast.LENGTH_SHORT).show();
+            // TODO: Open rating dialog
+        });
+
+        // Card click - view details
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailsActivity.class);
             intent.putExtra("product_id", product.getId());
             context.startActivity(intent);
         });
@@ -82,11 +99,31 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
+    // Favorites management methods
+    private boolean isFavoriteProduct(String productId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> favorites = prefs.getStringSet(FAVORITES_KEY, new HashSet<>());
+        return favorites.contains(productId);
+    }
+
+    private void addFavorite(String productId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> favorites = new HashSet<>(prefs.getStringSet(FAVORITES_KEY, new HashSet<>()));
+        favorites.add(productId);
+        prefs.edit().putStringSet(FAVORITES_KEY, favorites).apply();
+    }
+
+    private void removeFavorite(String productId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> favorites = new HashSet<>(prefs.getStringSet(FAVORITES_KEY, new HashSet<>()));
+        favorites.remove(productId);
+        prefs.edit().putStringSet(FAVORITES_KEY, favorites).apply();
+    }
+
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProductImage;
-        TextView tvProductName, tvProductCategory, tvProductPrice, tvProductUnit, tvRecommendCount;
-        ImageButton btnFavorite;
-        Button btnViewDetails;
+        TextView tvProductName, tvProductCategory, tvProductPrice, tvProductUnit;
+        Button btnFavorite, btnRate;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,9 +132,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvProductCategory = itemView.findViewById(R.id.tvProductCategory);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
             tvProductUnit = itemView.findViewById(R.id.tvProductUnit);
-            tvRecommendCount = itemView.findViewById(R.id.tvRecommendCount);
             btnFavorite = itemView.findViewById(R.id.btnFavorite);
-            btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
+            btnRate = itemView.findViewById(R.id.btnRate);
         }
     }
 

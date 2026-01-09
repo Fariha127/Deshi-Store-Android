@@ -211,6 +211,15 @@ public class HomeActivity extends AppCompatActivity {
         productAdapter = new ProductAdapter(this, productList);
         rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
         rvProducts.setAdapter(productAdapter);
+        rvProducts.setHasFixedSize(false);
+        
+        // Calculate and set minimum height based on item count
+        // Approximate item height: 400dp per item + extra padding
+        int itemHeight = (int) (400 * getResources().getDisplayMetrics().density);
+        int rows = (int) Math.ceil(productList.size() / 2.0);
+        int extraPadding = (int) (100 * getResources().getDisplayMetrics().density);
+        int totalHeight = (rows * itemHeight) + extraPadding;
+        rvProducts.setMinimumHeight(totalHeight);
     }
 
     private void setupClickListeners() {
