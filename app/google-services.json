@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "883798214850",
+    "project_id": "deshi-store-d62a0",
+    "storage_bucket": "deshi-store-d62a0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883798214850:android:de875172a21a782b7e535b",
+        "android_client_info": {
+          "package_name": "com.fariha.deshistore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkkghsKXpAI0ZIxA8g_D0xZSyi3qJbcME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
