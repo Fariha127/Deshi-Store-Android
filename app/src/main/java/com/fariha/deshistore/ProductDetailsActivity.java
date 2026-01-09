@@ -16,6 +16,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -121,39 +123,48 @@ public class ProductDetailsActivity extends AppCompatActivity {
             tvRecommendations.setText(product.getRecommendCount() + " Recommendations");
         }
         
+        // Load product image
+        if (ivProductImage != null && product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            Glide.with(this)
+                    .load(product.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(ivProductImage);
+        }
+        
         // Calculate and display rating
         updateRatingDisplay();
     }
     
     private Product getProductById(String productId) {
-        // Sample products - TODO: Replace with Firebase data
+        // Sample products with images - TODO: Replace with Firebase data
         switch (productId) {
             case "1":
-                return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
+                return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
             case "2":
-                return new Product("2", "MediPlus DS", "Toothpaste", 85.0, "100g", "", "Anfords Bangladesh Ltd.", 12, false);
+                return new Product("2", "MediPlus DS", "Toothpaste", 85.0, "100g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mediplus.jpg", "Anfords Bangladesh Ltd.", 12, false);
             case "3":
-                return new Product("3", "Spa Drinking Water", "Water", 20.0, "500ml", "", "Akij Food & Beverage Ltd. (AFBL)", 8, false);
+                return new Product("3", "Spa Drinking Water", "Water", 20.0, "500ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/spa-water.jpg", "Akij Food & Beverage Ltd. (AFBL)", 8, false);
             case "4":
-                return new Product("4", "Meril Milk Soap", "Moisturizing Soap", 35.0, "75g", "", "Square Toiletries Ltd.", 15, false);
+                return new Product("4", "Meril Milk Soap", "Moisturizing Soap", 35.0, "75g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/meril-soap.jpg", "Square Toiletries Ltd.", 15, false);
             case "5":
-                return new Product("5", "Shezan Mango Juice", "Mango Juice", 120.0, "1L", "", "Sajeeb Group", 20, false);
+                return new Product("5", "Shezan Mango Juice", "Mango Juice", 120.0, "1L", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/shezan-juice.jpg", "Sajeeb Group", 20, false);
             case "6":
-                return new Product("6", "Pran Potata Spicy", "Biscuit", 40.0, "200g", "", "Pran Foods Ltd.", 18, false);
+                return new Product("6", "Pran Potata Spicy", "Biscuit", 40.0, "200g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-potata.jpg", "Pran Foods Ltd.", 18, false);
             case "7":
-                return new Product("7", "Ruchi BBQ Chanachur", "Snack", 30.0, "150g", "", "Pran Foods Ltd.", 22, false);
+                return new Product("7", "Ruchi BBQ Chanachur", "Snack", 30.0, "150g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/ruchi-chanachur.jpg", "Pran Foods Ltd.", 22, false);
             case "8":
-                return new Product("8", "Bashundhara Towel", "Hand Towel", 80.0, "pack", "", "Bashundhara Paper Mills PLC", 10, false);
+                return new Product("8", "Bashundhara Towel", "Hand Towel", 80.0, "pack", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/bashundhara-towel.jpg", "Bashundhara Paper Mills PLC", 10, false);
             case "9":
-                return new Product("9", "Revive Perfect Skin", "Moisturizing Lotion", 150.0, "100ml", "", "Square Toiletries Ltd.", 14, false);
+                return new Product("9", "Revive Perfect Skin", "Moisturizing Lotion", 150.0, "100ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/revive-lotion.jpg", "Square Toiletries Ltd.", 14, false);
             case "10":
-                return new Product("10", "Jui HairCare Oil", "Hair Oil", 95.0, "200ml", "", "Square Toiletries Ltd.", 17, false);
+                return new Product("10", "Jui HairCare Oil", "Hair Oil", 95.0, "200ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/jui-oil.jpg", "Square Toiletries Ltd.", 17, false);
             case "11":
-                return new Product("11", "Radhuni Turmeric", "Powder", 55.0, "100g", "", "Square Food & Beverage Ltd.", 13, false);
+                return new Product("11", "Radhuni Turmeric", "Powder", 55.0, "100g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/radhuni-tumeric.jpg", "Square Food & Beverage Ltd.", 13, false);
             case "12":
-                return new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "", "Pran Dairy Ltd.", 19, false);
+                return new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-ghee.jpg", "Pran Dairy Ltd.", 19, false);
             default:
-                return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
+                return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
         }
     }
 

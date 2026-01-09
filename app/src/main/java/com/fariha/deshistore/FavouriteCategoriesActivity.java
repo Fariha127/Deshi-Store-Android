@@ -96,16 +96,16 @@ public class FavouriteCategoriesActivity extends AppCompatActivity {
     private void setupCategoryList() {
         categoryList = new ArrayList<>();
         
-        // Initialize all 9 categories
-        categoryList.add(new Category("1", "Beverages", "Refresh yourself with our beverage collection", ""));
-        categoryList.add(new Category("2", "Hair Care", "Premium hair care products for healthy hair", ""));
-        categoryList.add(new Category("3", "Oral Care", "Complete oral hygiene solutions", ""));
-        categoryList.add(new Category("4", "Snacks", "Delicious snacks for every occasion", ""));
-        categoryList.add(new Category("5", "Food & Grocery", "Daily essentials and grocery items", ""));
-        categoryList.add(new Category("6", "Home Care", "Keep your home clean and fresh", ""));
-        categoryList.add(new Category("7", "Skin Care", "Nourish your skin naturally", ""));
-        categoryList.add(new Category("8", "Baby Care", "Gentle care for your little ones", ""));
-        categoryList.add(new Category("9", "Dairy Products", "Fresh dairy products daily", ""));
+        // Initialize all 9 categories with images
+        categoryList.add(new Category("1", "Beverages", "Refresh yourself with our beverage collection", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/beverages-category.jpg"));
+        categoryList.add(new Category("2", "Hair Care", "Premium hair care products for healthy hair", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/haircare-category.jpg"));
+        categoryList.add(new Category("3", "Oral Care", "Complete oral hygiene solutions", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/oralcare-category.jpg"));
+        categoryList.add(new Category("4", "Snacks", "Delicious snacks for every occasion", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/snacks-category.jpg"));
+        categoryList.add(new Category("5", "Food & Grocery", "Daily essentials and grocery items", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/foodgrocery-category.jpg"));
+        categoryList.add(new Category("6", "Home Care", "Keep your home clean and fresh", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/homecare-category.jpg"));
+        categoryList.add(new Category("7", "Skin Care", "Nourish your skin naturally", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/skincare-category.jpg"));
+        categoryList.add(new Category("8", "Baby Care", "Gentle care for your little ones", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/babycare-category.jpg"));
+        categoryList.add(new Category("9", "Dairy Products", "Fresh dairy products daily", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/dairy-category.jpg"));
         
         // Filter favorite categories
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
