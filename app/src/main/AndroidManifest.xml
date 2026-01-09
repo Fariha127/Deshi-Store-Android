@@ -41,6 +41,9 @@
         <activity
             android:name=".ProductDetailsActivity"
             android:exported="false" />
+        <activity
+            android:name=".CategoryProductsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
