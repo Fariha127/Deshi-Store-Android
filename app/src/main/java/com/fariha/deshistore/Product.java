@@ -12,6 +12,9 @@ public class Product {
     private boolean isFavorite;
     private boolean isApproved;
     private String vendorId;
+    private String productId;
+    private String status;
+    private String rejectionReason;
 
     // Default constructor
     public Product() {
@@ -95,6 +98,18 @@ public class Product {
         return vendorId;
     }
 
+    public String getProductId() {
+        return productId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
     // Setters
     public void setId(String id) {
         this.id = id;
@@ -138,6 +153,18 @@ public class Product {
 
     public void setVendorId(String vendorId) {
         this.vendorId = vendorId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public void incrementRecommendCount() {

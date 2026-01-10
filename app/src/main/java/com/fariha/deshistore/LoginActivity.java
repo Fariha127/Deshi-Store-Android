@@ -96,6 +96,13 @@ public class LoginActivity extends AppCompatActivity {
             }
             etPassword.setSelection(etPassword.getText().length());
         });
+
+        // Hidden feature: Long press on "Back to Home" button to initialize test vendor accounts
+        btnBackToHome.setOnLongClickListener(v -> {
+            Toast.makeText(this, "Initializing test vendor accounts...", Toast.LENGTH_LONG).show();
+            new InitializeTestAccounts(this).createTestVendorAccounts();
+            return true;
+        });
     }
 
     private void handleLogin() {
@@ -112,8 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         if (loginType.equals("Admin")) {
             if (email.equals(ADMIN_EMAIL) && password.equals(ADMIN_PASSWORD)) {
                 Toast.makeText(this, "Admin login successful", Toast.LENGTH_SHORT).show();
-                // TODO: Navigate to Admin Dashboard
-                startActivity(new Intent(this, HomeActivity.class));
+                startActivity(new Intent(this, AdminDashboardActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "Incorrect email or password!", Toast.LENGTH_SHORT).show();
@@ -139,8 +145,7 @@ public class LoginActivity extends AppCompatActivity {
     private void verifyAndLoginUser(String userId, String expectedLoginType) {
         // Add timeout handler
         new android.os.Handler().postDelayed(() -> {
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-            finish();
+            navigateBasedOnUserType(expectedLoginType);
         }, 5000); // 5 second timeout
         
         mDatabase.child("users").child(userId).get()
@@ -154,22 +159,35 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         
                         if (userType.equals(expectedLoginType)) {
-                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                            finish();
+                            navigateBasedOnUserType(expectedLoginType);
                         } else {
                             Toast.makeText(this, "Invalid login type for this account", Toast.LENGTH_SHORT).show();
                             mAuth.signOut();
                         }
                     } else {
-                        // Still navigate to home since they are authenticated
-                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                        finish();
+                        // Still navigate based on expected type since they are authenticated
+                        navigateBasedOnUserType(expectedLoginType);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Still navigate to home since they are authenticated
-                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                    finish();
+                    // Still navigate based on expected type since they are authenticated
+                    navigateBasedOnUserType(expectedLoginType);
                 });
+    }
+    
+    private void navigateBasedOnUserType(String userType) {
+        Intent intent;
+        switch (userType) {
+            case "Company Vendor":
+            case "Retail Vendor":
+                intent = new Intent(LoginActivity.this, VendorDashboardActivity.class);
+                break;
+            case "User":
+            default:
+                intent = new Intent(LoginActivity.this, HomeActivity.class);
+                break;
+        }
+        startActivity(intent);
+        finish();
     }
 }
