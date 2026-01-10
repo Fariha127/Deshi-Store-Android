@@ -16,7 +16,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
-    private Button btnLogout, btnInitAccounts;
+    private Button btnLogout, btnInitAccounts, btnInitProducts;
     private FirebaseAuth mAuth;
 
     @Override
@@ -30,6 +30,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
         btnLogout = findViewById(R.id.btnLogout);
         btnInitAccounts = findViewById(R.id.btnInitAccounts);
+        btnInitProducts = findViewById(R.id.btnInitProducts);
 
         // Setup ViewPager with adapter
         AdminPagerAdapter adapter = new AdminPagerAdapter(this);
@@ -64,6 +65,17 @@ public class AdminDashboardActivity extends AppCompatActivity {
             // Check database after 5 seconds
             new android.os.Handler().postDelayed(() -> {
                 checkDatabaseAccounts();
+            }, 5000);
+        });
+
+        btnInitProducts.setOnClickListener(v -> {
+            Toast.makeText(this, "Initializing sample products... Please wait", Toast.LENGTH_LONG).show();
+            android.util.Log.d("AdminDashboard", "Starting product initialization...");
+            
+            new InitializeSampleProducts(this).createSampleProducts();
+            
+            new android.os.Handler().postDelayed(() -> {
+                Toast.makeText(this, "Sample products created! Check vendor dashboards.", Toast.LENGTH_LONG).show();
             }, 5000);
         });
 

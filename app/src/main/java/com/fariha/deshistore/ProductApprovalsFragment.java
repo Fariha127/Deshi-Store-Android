@@ -16,11 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,8 @@ public class ProductApprovalsFragment extends Fragment {
     private Button btnRefresh;
     private ProductApprovalAdapter adapter;
     private List<Product> productList;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
+    private ListenerRegistration productsListener;
 
     @Nullable
     @Override
@@ -46,7 +45,7 @@ public class ProductApprovalsFragment extends Fragment {
         adapter = new ProductApprovalAdapter(productList, this::approveProduct, this::rejectProduct);
         recyclerView.setAdapter(adapter);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
 
         btnRefresh.setOnClickListener(v -> loadPendingProducts());
 
@@ -56,26 +55,28 @@ public class ProductApprovalsFragment extends Fragment {
     }
 
     private void loadPendingProducts() {
-        mDatabase.child("products").orderByChild("status").equalTo("pending")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        productList.clear();
-                        for (DataSnapshot productSnapshot : snapshot.getChildren()) {
-                            Product product = productSnapshot.getValue(Product.class);
-                            if (product != null) {
-                                product.setProductId(productSnapshot.getKey());
-                                productList.add(product);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(), "Loaded " + productList.size() + " pending products", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+        if (productsListener != null) {
+            productsListener.remove();
+        }
+        
+        productsListener = mDatabase.collection("products")
+                .whereEqualTo("status", "pending")
+                .addSnapshotListener((queryDocumentSnapshots, error) -> {
+                    if (error != null) {
                         Toast.makeText(getContext(), "Error loading products", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    
+                    productList.clear();
+                    if (queryDocumentSnapshots != null) {
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            Product product = document.toObject(Product.class);
+                            product.setProductId(document.getId());
+                            productList.add(product);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(), "Loaded " + productList.size() + " pending products", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -84,10 +85,10 @@ public class ProductApprovalsFragment extends Fragment {
                 .setTitle("Approve Product")
                 .setMessage("Are you sure you want to approve this product?")
                 .setPositiveButton("Approve", (dialog, which) -> {
-                    mDatabase.child("products").child(product.getProductId()).child("status").setValue("approved")
+                    mDatabase.collection("products").document(product.getProductId())
+                            .update("status", "approved")
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(getContext(), "Product approved", Toast.LENGTH_SHORT).show();
-                                loadPendingProducts();
                             })
                             .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to approve", Toast.LENGTH_SHORT).show());
                 })
@@ -112,16 +113,27 @@ public class ProductApprovalsFragment extends Fragment {
                 return;
             }
 
-            mDatabase.child("products").child(product.getProductId()).child("status").setValue("rejected");
-            mDatabase.child("products").child(product.getProductId()).child("rejectionReason").setValue(reason)
+            java.util.Map<String, Object> updates = new java.util.HashMap<>();
+            updates.put("status", "rejected");
+            updates.put("rejectionReason", reason);
+            
+            mDatabase.collection("products").document(product.getProductId())
+                    .update(updates)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(getContext(), "Product rejected", Toast.LENGTH_SHORT).show();
-                        loadPendingProducts();
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to reject", Toast.LENGTH_SHORT).show());
         });
 
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (productsListener != null) {
+            productsListener.remove();
+        }
     }
 }

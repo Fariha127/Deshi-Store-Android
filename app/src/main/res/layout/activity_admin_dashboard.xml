@@ -35,6 +35,19 @@
             android:textSize="12sp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
+            android:layout_marginEnd="4dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnInitProducts"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/button_green"
+            android:text="Init Products"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:layout_marginEnd="8dp" />
 
         <androidx.appcompat.widget.AppCompatButton

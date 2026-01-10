@@ -10,11 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ public class ProductStatusActivity extends AppCompatActivity {
     private Button btnBackToDashboard;
     private ProductStatusAdapter adapter;
     private List<Product> productList;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
     private FirebaseAuth mAuth;
     private String vendorId;
 
@@ -35,7 +32,7 @@ public class ProductStatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_status);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
         vendorId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "";
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -52,29 +49,25 @@ public class ProductStatusActivity extends AppCompatActivity {
     }
 
     private void loadAllProducts() {
-        mDatabase.child("products")
-                .orderByChild("vendorId")
-                .equalTo(vendorId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        productList.clear();
-                        for (DataSnapshot productSnapshot : snapshot.getChildren()) {
-                            Product product = productSnapshot.getValue(Product.class);
-                            if (product != null) {
-                                product.setProductId(productSnapshot.getKey());
-                                productList.add(product);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(ProductStatusActivity.this, 
-                                "Loaded " + productList.size() + " products", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
+        mDatabase.collection("products")
+                .whereEqualTo("vendorId", vendorId)
+                .addSnapshotListener((queryDocumentSnapshots, error) -> {
+                    if (error != null) {
                         Toast.makeText(ProductStatusActivity.this, "Error loading products", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    
+                    productList.clear();
+                    if (queryDocumentSnapshots != null) {
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            Product product = document.toObject(Product.class);
+                            product.setProductId(document.getId());
+                            productList.add(product);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(ProductStatusActivity.this, 
+                            "Loaded " + productList.size() + " products", Toast.LENGTH_SHORT).show();
                 });
     }
 }

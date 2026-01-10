@@ -16,8 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -33,7 +32,7 @@ public class AddProductActivity extends AppCompatActivity {
     private Uri selectedImageUri;
     private String vendorCompanyName = "";
     
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
     private StorageReference mStorage;
     private FirebaseAuth mAuth;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -44,7 +43,7 @@ public class AddProductActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_product);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
 
         initializeViews();
@@ -87,13 +86,13 @@ public class AddProductActivity extends AppCompatActivity {
 
     private void loadVendorCompanyName() {
         String vendorId = mAuth.getCurrentUser().getUid();
-        mDatabase.child("users").child(vendorId).get()
+        mDatabase.collection("users").document(vendorId).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
-                        vendorCompanyName = snapshot.child("companyName").getValue(String.class);
+                        vendorCompanyName = snapshot.getString("companyName");
                         if (vendorCompanyName == null || vendorCompanyName.isEmpty()) {
                             // For retail vendors, use shopName
-                            vendorCompanyName = snapshot.child("shopName").getValue(String.class);
+                            vendorCompanyName = snapshot.getString("shopName");
                         }
                         if (vendorCompanyName != null && !vendorCompanyName.isEmpty()) {
                             etManufacturer.setText(vendorCompanyName);
@@ -150,7 +149,7 @@ public class AddProductActivity extends AppCompatActivity {
         }
 
         String vendorId = mAuth.getCurrentUser().getUid();
-        String productId = mDatabase.child("products").push().getKey();
+        String productId = mDatabase.collection("products").document().getId();
 
         // Upload image first
         StorageReference imageRef = mStorage.child("products/" + productId + ".jpg");
@@ -180,8 +179,9 @@ public class AddProductActivity extends AppCompatActivity {
         productData.put("vendorId", vendorId);
         productData.put("status", "pending");
         productData.put("type", "vendor");
+        productData.put("createdAt", System.currentTimeMillis());
 
-        mDatabase.child("products").child(productId).setValue(productData)
+        mDatabase.collection("products").document(productId).set(productData)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Product submitted for approval", Toast.LENGTH_SHORT).show();
                     finish();
