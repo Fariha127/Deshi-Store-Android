@@ -13,11 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,8 @@ public class UsersFragment extends Fragment {
     private Button btnRefresh;
     private UserListAdapter adapter;
     private List<User> userList;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
+    private ListenerRegistration usersListener;
 
     @Nullable
     @Override
@@ -43,7 +42,7 @@ public class UsersFragment extends Fragment {
         adapter = new UserListAdapter(userList);
         recyclerView.setAdapter(adapter);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
 
         btnRefresh.setOnClickListener(v -> loadUsers());
 
@@ -53,28 +52,43 @@ public class UsersFragment extends Fragment {
     }
 
     private void loadUsers() {
-        mDatabase.child("users").orderByChild("userType").equalTo("User")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        userList.clear();
-                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+        // Remove old listener if exists
+        if (usersListener != null) {
+            usersListener.remove();
+        }
+        
+        // Use real-time listener for automatic updates from Firestore
+        usersListener = mDatabase.collection("users")
+                .whereEqualTo("userType", "User")
+                .addSnapshotListener((queryDocumentSnapshots, error) -> {
+                    if (error != null) {
+                        Toast.makeText(getContext(), "Error loading users", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    userList.clear();
+                    if (queryDocumentSnapshots != null) {
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             User user = new User();
-                            user.setUserId(userSnapshot.getKey());
-                            user.setFullName(userSnapshot.child("fullName").getValue(String.class));
-                            user.setEmail(userSnapshot.child("email").getValue(String.class));
-                            user.setPhoneNumber(userSnapshot.child("phoneNumber").getValue(String.class));
-                            user.setCity(userSnapshot.child("city").getValue(String.class));
+                            user.setUserId(document.getId());
+                            user.setFullName(document.getString("fullName"));
+                            user.setEmail(document.getString("email"));
+                            user.setPhoneNumber(document.getString("phoneNumber"));
+                            user.setCity(document.getString("city"));
                             userList.add(user);
                         }
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(), "Loaded " + userList.size() + " users", Toast.LENGTH_SHORT).show();
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(getContext(), "Error loading users", Toast.LENGTH_SHORT).show();
-                    }
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(), "Loaded " + userList.size() + " users", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Remove listener to prevent memory leaks
+        if (usersListener != null) {
+            usersListener.remove();
+        }
     }
 }

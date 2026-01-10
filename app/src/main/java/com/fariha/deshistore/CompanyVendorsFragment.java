@@ -13,11 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,8 @@ public class CompanyVendorsFragment extends Fragment {
     private Button btnRefresh;
     private VendorListAdapter adapter;
     private List<Vendor> vendorList;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mDatabase;
+    private ListenerRegistration vendorsListener;
 
     @Nullable
     @Override
@@ -43,7 +42,7 @@ public class CompanyVendorsFragment extends Fragment {
         adapter = new VendorListAdapter(vendorList);
         recyclerView.setAdapter(adapter);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
 
         btnRefresh.setOnClickListener(v -> loadVendors());
 
@@ -53,29 +52,52 @@ public class CompanyVendorsFragment extends Fragment {
     }
 
     private void loadVendors() {
-        mDatabase.child("users").orderByChild("userType").equalTo("Company Vendor")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        vendorList.clear();
-                        for (DataSnapshot vendorSnapshot : snapshot.getChildren()) {
+        Toast.makeText(getContext(), "Loading company vendors...", Toast.LENGTH_SHORT).show();
+        
+        // Remove old listener if exists
+        if (vendorsListener != null) {
+            vendorsListener.remove();
+        }
+        
+        // Use real-time listener for automatic updates from Firestore
+        vendorsListener = mDatabase.collection("users")
+                .whereEqualTo("userType", "Company Vendor")
+                .addSnapshotListener((queryDocumentSnapshots, error) -> {
+                    if (error != null) {
+                        android.util.Log.e("CompanyVendors", "Error: " + error.getMessage());
+                        Toast.makeText(getContext(), "Error loading vendors: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    vendorList.clear();
+                    if (queryDocumentSnapshots != null) {
+                        android.util.Log.d("CompanyVendors", "Total company vendors: " + queryDocumentSnapshots.size());
+                        
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             Vendor vendor = new Vendor();
-                            vendor.setVendorId(vendorSnapshot.getKey());
-                            vendor.setCompanyName(vendorSnapshot.child("companyName").getValue(String.class));
-                            vendor.setContactPerson(vendorSnapshot.child("fullName").getValue(String.class));
-                            vendor.setEmail(vendorSnapshot.child("email").getValue(String.class));
-                            vendor.setPhoneNumber(vendorSnapshot.child("phoneNumber").getValue(String.class));
-                            vendor.setStatus(vendorSnapshot.child("status").getValue(String.class));
+                            vendor.setVendorId(document.getId());
+                            vendor.setCompanyName(document.getString("companyName"));
+                            vendor.setContactPerson(document.getString("fullName"));
+                            vendor.setEmail(document.getString("email"));
+                            vendor.setPhoneNumber(document.getString("phoneNumber"));
+                            vendor.setStatus(document.getString("status"));
+                            
+                            android.util.Log.d("CompanyVendors", "Added: " + vendor.getCompanyName() + ", Email: " + vendor.getEmail());
                             vendorList.add(vendor);
                         }
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(), "Loaded " + vendorList.size() + " vendors", Toast.LENGTH_SHORT).show();
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(getContext(), "Error loading vendors", Toast.LENGTH_SHORT).show();
-                    }
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(), "Loaded " + vendorList.size() + " company vendors", Toast.LENGTH_LONG).show();
+                    android.util.Log.d("CompanyVendors", "Final count: " + vendorList.size());
                 });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Remove listener to prevent memory leaks
+        if (vendorsListener != null) {
+            vendorsListener.remove();
+        }
     }
 }

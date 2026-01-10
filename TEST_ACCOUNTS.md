@@ -107,13 +107,50 @@
 
 ---
 
+## Retail Vendor Accounts
+
+### 1. Dhaka Grocery Store
+- **Email:** `vendor1@findingbd.com`
+- **Password:** `password123`
+- **Shop Name:** Dhaka Grocery Store
+- **Owner:** Karim Rahman
+- **Phone:** +8801811111111
+- **Registration:** RET-REG-001
+- **Trade License:** TL-001
+- **TIN:** TIN-RET001
+- **Address:** Shop 12, Mohammadpur Bazaar, Dhaka
+
+### 2. Chattogram Super Shop
+- **Email:** `vendor2@findingbd.com`
+- **Password:** `password123`
+- **Shop Name:** Chattogram Super Shop
+- **Owner:** Fatema Khatun
+- **Phone:** +8801822222222
+- **Registration:** RET-REG-002
+- **Trade License:** TL-002
+- **TIN:** TIN-RET002
+- **Address:** 45 Agrabad Commercial Area, Chattogram
+
+### 3. Sylhet Mini Mart
+- **Email:** `vendor3@findingbd.com`
+- **Password:** `password123`
+- **Shop Name:** Sylhet Mini Mart
+- **Owner:** Rahim Miah
+- **Phone:** +8801833333333
+- **Registration:** RET-REG-003
+- **Trade License:** TL-003
+- **TIN:** TIN-RET003
+- **Address:** Zindabazar Main Road, Sylhet
+
+---
+
 ## How to Initialize Test Accounts
 
 ### Method 1: Using the Hidden Feature
 1. Open the app and go to the Login screen
 2. **Long press** the "Back to Home" button
 3. Wait for the toast messages confirming account creation
-4. All 8 vendor accounts will be created in Firebase
+4. All 8 company vendors + 3 retail vendors will be created in Firebase
 
 ### Method 2: Manual Creation
 Users can also register manually through:
@@ -129,16 +166,20 @@ Users can also register manually through:
 3. Select user type from dropdown:
    - **Admin** → Use admin credentials
    - **Company Vendor** → Use any of the 8 company vendor credentials above
-   - **Retail Vendor** → Register manually
+   - **Retail Vendor** → Use vendor1/2/3 credentials or register manually
    - **User** → Register manually
 4. Enter email and password
 5. Click Login
 
 ## Access Levels
 
-- **Admin:** Full dashboard access with user management, vendor management, and product approvals
-- **Company Vendors:** Vendor dashboard with product management and order tracking
-- **Retail Vendors:** Vendor dashboard with product management and order tracking
+- **Admin:** Full dashboard access with:
+  - **Users Tab:** View all regular user accounts and their details
+  - **Company Vendors Tab:** View all 8 company vendors and their company information
+  - **Retail Vendors Tab:** View all 3 retail vendors and their shop information
+  - **Product Approvals Tab:** Approve or reject vendor product submissions
+- **Company Vendors:** Vendor dashboard with product management (manufacturer auto-filled with company name)
+- **Retail Vendors:** Vendor dashboard with product management (manufacturer auto-filled with shop name)
 - **Users:** Home screen with shopping capabilities
 
 ---
@@ -156,8 +197,15 @@ The manufacturer field in the Add Product screen is read-only and auto-populated
 
 ## Notes
 
-- All vendor accounts use the same password: `password123`
+- **All vendor accounts** (company + retail) use the same password: `password123`
 - Admin credentials are hardcoded: `admin@findingbd.com` / `admin123`
+- **Total test accounts created:**
+  - 1 Admin account (hardcoded)
+  - 8 Company Vendor accounts
+  - 3 Retail Vendor accounts
+  - User accounts created via app registration
 - Vendor accounts are stored in Firebase Realtime Database under `users/{userId}`
 - Each vendor account requires Firebase Authentication to be initialized first
-- The manufacturer field is automatically populated from the vendor's company name
+- The manufacturer field is automatically populated:
+  - Company vendors → Company name (e.g., "Akij Food & Beverage Ltd.")
+  - Retail vendors → Shop name (e.g., "Dhaka Grocery Store")
