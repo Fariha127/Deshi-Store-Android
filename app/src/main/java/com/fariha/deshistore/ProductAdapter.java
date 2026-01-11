@@ -3,6 +3,9 @@ package com.fariha.deshistore;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -28,12 +32,25 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private Context context;
     private List<Product> productList;
+    private List<Product> productListFull; // For search filtering
+    private boolean isVendorView = false;
     private static final String PREFS_NAME = "FavoritesPrefs";
     private static final String FAVORITES_KEY = "favorites";
 
+    // Default constructor for user view
     public ProductAdapter(Context context, List<Product> productList) {
         this.context = context;
         this.productList = productList;
+        this.productListFull = new ArrayList<>(productList);
+        this.isVendorView = false;
+    }
+    
+    // Constructor for vendor view
+    public ProductAdapter(Context context, List<Product> productList, boolean isVendorView) {
+        this.context = context;
+        this.productList = productList;
+        this.productListFull = new ArrayList<>(productList);
+        this.isVendorView = isVendorView;
     }
 
     @NonNull
@@ -52,6 +69,33 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvProductPrice.setText(String.format(Locale.getDefault(), "৳ %.0f", product.getPrice()));
         holder.tvProductUnit.setText("/" + product.getUnit());
 
+        // Get the correct product ID (prefer productId from Firestore, fallback to id)
+        String productIdForIntent = product.getProductId() != null ? product.getProductId() : product.getId();
+
+        // Vendor view: show only View button, hide Favorite and Rate
+        if (isVendorView) {
+            holder.btnFavorite.setVisibility(View.GONE);
+            holder.btnRate.setText("View");
+            holder.btnRate.setOnClickListener(v -> {
+                Intent intent = new Intent(context, VendorProductDetailsActivity.class);
+                intent.putExtra("product_id", productIdForIntent);
+                context.startActivity(intent);
+            });
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, VendorProductDetailsActivity.class);
+                intent.putExtra("product_id", productIdForIntent);
+                context.startActivity(intent);
+            });
+            
+            // Load image and return early for vendor view
+            loadProductImage(holder, product);
+            return;
+        }
+
+        // User view: show all buttons
+        holder.btnFavorite.setVisibility(View.VISIBLE);
+        holder.btnRate.setText("Rate");
+        
         // Check if product is in favorites
         boolean isFavorite = isFavoriteProduct(product.getId());
         
@@ -68,17 +112,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.btnFavorite.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
         }
 
-        // Load image if URL is provided
-        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            Glide.with(context)
-                    .load(product.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.ivProductImage);
-        } else {
-            holder.ivProductImage.setImageResource(R.drawable.ic_launcher_background);
-        }
+        // Load image
+        loadProductImage(holder, product);
 
         // Favorite button click
         holder.btnFavorite.setOnClickListener(v -> {
@@ -104,16 +139,46 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         // Rate button click - navigate to product details
         holder.btnRate.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProductDetailsActivity.class);
-            intent.putExtra("product_id", product.getId());
+            intent.putExtra("product_id", productIdForIntent);
             context.startActivity(intent);
         });
 
         // Card click - view details
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProductDetailsActivity.class);
-            intent.putExtra("product_id", product.getId());
+            intent.putExtra("product_id", productIdForIntent);
             context.startActivity(intent);
         });
+    }
+    
+    private void loadProductImage(ProductViewHolder holder, Product product) {
+        // Load image if URL is provided
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            String imageUrl = product.getImageUrl();
+            
+            // Check if it's a Base64 data URL
+            if (imageUrl.startsWith("data:image")) {
+                try {
+                    // Extract Base64 data after the comma
+                    String base64Data = imageUrl.substring(imageUrl.indexOf(",") + 1);
+                    byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    holder.ivProductImage.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    holder.ivProductImage.setImageResource(R.drawable.ic_launcher_background);
+                }
+            } else {
+                // Regular URL - use Glide
+                Glide.with(context)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_launcher_background)
+                        .error(R.drawable.ic_launcher_background)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(holder.ivProductImage);
+            }
+        } else {
+            holder.ivProductImage.setImageResource(R.drawable.ic_launcher_background);
+        }
     }
 
     @Override
@@ -161,6 +226,34 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     public void updateProductList(List<Product> newProductList) {
         this.productList = newProductList;
+        this.productListFull = new ArrayList<>(newProductList);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Filter products by search query (name, category, or manufacturer)
+     * @param query The search query string
+     */
+    public void filter(String query) {
+        productList.clear();
+        if (query == null || query.trim().isEmpty()) {
+            productList.addAll(productListFull);
+        } else {
+            String searchQuery = query.toLowerCase().trim();
+            for (Product product : productListFull) {
+                // Search in name, category, and manufacturer
+                boolean matchesName = product.getName() != null && 
+                        product.getName().toLowerCase().contains(searchQuery);
+                boolean matchesCategory = product.getCategory() != null && 
+                        product.getCategory().toLowerCase().contains(searchQuery);
+                boolean matchesManufacturer = product.getManufacturer() != null && 
+                        product.getManufacturer().toLowerCase().contains(searchQuery);
+                
+                if (matchesName || matchesCategory || matchesManufacturer) {
+                    productList.add(product);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 }

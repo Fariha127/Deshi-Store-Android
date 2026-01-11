@@ -1,9 +1,15 @@
 package com.fariha.deshistore;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,14 +18,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,9 +42,13 @@ public class AddProductActivity extends AppCompatActivity {
     private String vendorCompanyName = "";
     
     private FirebaseFirestore mDatabase;
-    private StorageReference mStorage;
     private FirebaseAuth mAuth;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PERMISSION_REQUEST_CODE = 100;
+    
+    // Max image size for Base64 storage (compress to ~500KB)
+    private static final int MAX_IMAGE_DIMENSION = 800;
+    private static final int JPEG_QUALITY = 70;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +57,6 @@ public class AddProductActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseFirestore.getInstance();
-        mStorage = FirebaseStorage.getInstance().getReference();
 
         initializeViews();
         setupCategorySpinner();
@@ -85,30 +97,107 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void loadVendorCompanyName() {
+        if (mAuth.getCurrentUser() == null) {
+            Log.e("AddProduct", "No authenticated user");
+            etManufacturer.setText("Unknown Manufacturer");
+            return;
+        }
+        
         String vendorId = mAuth.getCurrentUser().getUid();
+        Log.d("AddProduct", "Loading vendor info for: " + vendorId);
+        
         mDatabase.collection("users").document(vendorId).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
+                        Log.d("AddProduct", "User document found: " + snapshot.getData());
+                        
+                        // Try multiple possible field names for company/shop name
                         vendorCompanyName = snapshot.getString("companyName");
+                        
                         if (vendorCompanyName == null || vendorCompanyName.isEmpty()) {
-                            // For retail vendors, use shopName
                             vendorCompanyName = snapshot.getString("shopName");
                         }
+                        
+                        if (vendorCompanyName == null || vendorCompanyName.isEmpty()) {
+                            vendorCompanyName = snapshot.getString("name");
+                        }
+                        
+                        if (vendorCompanyName == null || vendorCompanyName.isEmpty()) {
+                            vendorCompanyName = snapshot.getString("businessName");
+                        }
+                        
                         if (vendorCompanyName != null && !vendorCompanyName.isEmpty()) {
                             etManufacturer.setText(vendorCompanyName);
+                            Log.d("AddProduct", "Set manufacturer to: " + vendorCompanyName);
                         } else {
-                            etManufacturer.setText("Unknown Manufacturer");
+                            // Use email as fallback
+                            String email = mAuth.getCurrentUser().getEmail();
+                            if (email != null && email.contains("@")) {
+                                vendorCompanyName = email.split("@")[0];
+                                etManufacturer.setText(vendorCompanyName);
+                            } else {
+                                vendorCompanyName = "Vendor";
+                                etManufacturer.setText("Vendor");
+                            }
+                            Log.d("AddProduct", "Using fallback manufacturer: " + vendorCompanyName);
                         }
+                    } else {
+                        Log.e("AddProduct", "User document not found");
+                        vendorCompanyName = "Unknown Manufacturer";
+                        etManufacturer.setText(vendorCompanyName);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load vendor information", Toast.LENGTH_SHORT).show();
+                    Log.e("AddProduct", "Failed to load vendor info", e);
+                    Toast.makeText(this, "Failed to load vendor info: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    vendorCompanyName = "Unknown";
+                    etManufacturer.setText(vendorCompanyName);
                 });
     }
 
     private void openImagePicker() {
+        // Check for permission based on Android version
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ uses READ_MEDIA_IMAGES
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                        PERMISSION_REQUEST_CODE);
+                return;
+            }
+        } else {
+            // Older versions use READ_EXTERNAL_STORAGE
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_CODE);
+                return;
+            }
+        }
+        
+        // Permission granted, open picker
+        launchImagePicker();
+    }
+    
+    private void launchImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                          @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchImagePicker();
+            } else {
+                Toast.makeText(this, "Permission denied. Cannot select image.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -116,8 +205,13 @@ public class AddProductActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
-            ivImagePreview.setImageURI(selectedImageUri);
-            ivImagePreview.setVisibility(View.VISIBLE);
+            if (selectedImageUri != null) {
+                ivImagePreview.setImageURI(selectedImageUri);
+                ivImagePreview.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Image selected successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed to get image", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -148,21 +242,68 @@ public class AddProductActivity extends AppCompatActivity {
             return;
         }
 
+        // Disable submit button to prevent double submissions
+        btnSubmit.setEnabled(false);
+        btnSubmit.setText("Processing...");
+        
         String vendorId = mAuth.getCurrentUser().getUid();
         String productId = mDatabase.collection("products").document().getId();
 
-        // Upload image first
-        StorageReference imageRef = mStorage.child("products/" + productId + ".jpg");
-        imageRef.putFile(selectedImageUri)
-                .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl()
-                        .addOnSuccessListener(uri -> {
-                            saveProductToDatabase(productId, name, manufacturer, description, 
-                                    price, unit, category, uri.toString(), vendorId);
-                        }))
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to upload image: " + e.getMessage(), 
-                            Toast.LENGTH_SHORT).show();
-                });
+        Log.d("AddProduct", "Processing product: " + productId);
+
+        try {
+            // Convert image to compressed bitmap
+            Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+            
+            // Resize image to reduce size
+            Bitmap resizedBitmap = resizeBitmap(originalBitmap, MAX_IMAGE_DIMENSION);
+            
+            // Convert to Base64
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, baos);
+            byte[] imageBytes = baos.toByteArray();
+            String base64Image = "data:image/jpeg;base64," + Base64.encodeToString(imageBytes, Base64.DEFAULT);
+            
+            Log.d("AddProduct", "Image converted to Base64, size: " + base64Image.length() + " chars");
+            
+            // Check if image is too large for Firestore (max ~1MB per document)
+            if (base64Image.length() > 900000) {
+                btnSubmit.setEnabled(true);
+                btnSubmit.setText("Submit Product");
+                Toast.makeText(this, "Image too large. Please select a smaller image.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            
+            // Save directly to Firestore with Base64 image
+            saveProductToDatabase(productId, name, manufacturer, description, 
+                    price, unit, category, base64Image, vendorId);
+                    
+        } catch (IOException e) {
+            Log.e("AddProduct", "Failed to read image", e);
+            btnSubmit.setEnabled(true);
+            btnSubmit.setText("Submit Product");
+            Toast.makeText(this, "Failed to read image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.e("AddProduct", "Submit product error", e);
+            btnSubmit.setEnabled(true);
+            btnSubmit.setText("Submit Product");
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    private Bitmap resizeBitmap(Bitmap original, int maxDimension) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+        
+        if (width <= maxDimension && height <= maxDimension) {
+            return original;
+        }
+        
+        float ratio = Math.min((float) maxDimension / width, (float) maxDimension / height);
+        int newWidth = Math.round(width * ratio);
+        int newHeight = Math.round(height * ratio);
+        
+        return Bitmap.createScaledBitmap(original, newWidth, newHeight, true);
     }
 
     private void saveProductToDatabase(String productId, String name, String manufacturer,

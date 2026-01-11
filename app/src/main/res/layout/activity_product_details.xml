@@ -491,6 +491,19 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
+                    <!-- No Reviews Placeholder -->
+                    <TextView
+                        android:id="@+id/tvNoReviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:text="No reviews yet. Be the first to review!"
+                        android:textColor="#999999"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+
                     <!-- Reviews RecyclerView -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvReviews"

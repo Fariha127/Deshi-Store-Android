@@ -16,29 +16,47 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
-    private Button btnLogout, btnInitAccounts, btnInitProducts;
+    private Button btnLogout, btnInitAccounts, btnInitProducts, btnMigrateUsers;
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_dashboard);
-
+        android.util.Log.d("AdminDashboard", "onCreate started");
+        
         mAuth = FirebaseAuth.getInstance();
+        
+        // Check if user is authenticated
+        if (mAuth.getCurrentUser() == null) {
+            android.util.Log.e("AdminDashboard", "User not authenticated! Redirecting to login.");
+            Toast.makeText(this, "Please login first", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+        
+        android.util.Log.d("AdminDashboard", "Current user: " + mAuth.getCurrentUser().getEmail());
+        
+        setContentView(R.layout.activity_admin_dashboard);
 
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
         btnLogout = findViewById(R.id.btnLogout);
         btnInitAccounts = findViewById(R.id.btnInitAccounts);
         btnInitProducts = findViewById(R.id.btnInitProducts);
+        btnMigrateUsers = findViewById(R.id.btnMigrateUsers);
+        
+        android.util.Log.d("AdminDashboard", "Views: tabLayout=" + (tabLayout != null) + ", viewPager=" + (viewPager != null));
 
         // Setup ViewPager with adapter
         AdminPagerAdapter adapter = new AdminPagerAdapter(this);
         viewPager.setAdapter(adapter);
+        android.util.Log.d("AdminDashboard", "ViewPager adapter set, item count: " + adapter.getItemCount());
 
         // Connect TabLayout with ViewPager2
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
+                    android.util.Log.d("AdminDashboard", "Creating tab for position: " + position);
                     switch (position) {
                         case 0:
                             tab.setText("Users");
@@ -77,6 +95,26 @@ public class AdminDashboardActivity extends AppCompatActivity {
             new android.os.Handler().postDelayed(() -> {
                 Toast.makeText(this, "Sample products created! Check vendor dashboards.", Toast.LENGTH_LONG).show();
             }, 5000);
+        });
+
+        btnMigrateUsers.setOnClickListener(v -> {
+            Toast.makeText(this, "Starting user migration from Realtime DB to Firestore...", Toast.LENGTH_LONG).show();
+            MigrationUtils.migrateRealtimeUsersToFirestore(this, new MigrationUtils.MigrationCallback() {
+                @Override
+                public void onProgress(int migrated, int total) {
+                    runOnUiThread(() -> Toast.makeText(AdminDashboardActivity.this, "Migrated " + migrated + " / " + total, Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onComplete(int migrated) {
+                    runOnUiThread(() -> Toast.makeText(AdminDashboardActivity.this, "Migration complete: " + migrated + " users", Toast.LENGTH_LONG).show());
+                }
+
+                @Override
+                public void onError(String message) {
+                    runOnUiThread(() -> Toast.makeText(AdminDashboardActivity.this, "Migration error: " + message, Toast.LENGTH_LONG).show());
+                }
+            });
         });
 
         btnLogout.setOnClickListener(v -> {

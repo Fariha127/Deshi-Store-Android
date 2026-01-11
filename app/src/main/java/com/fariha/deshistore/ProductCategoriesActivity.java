@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +26,7 @@ import java.util.Set;
 public class ProductCategoriesActivity extends AppCompatActivity {
 
     private RecyclerView rvCategories;
+    private EditText etSearch;
     private CategoryAdapter categoryAdapter;
     private List<Category> categoryList;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
@@ -37,10 +41,12 @@ public class ProductCategoriesActivity extends AppCompatActivity {
         setupCategoryList();
         setupRecyclerView();
         setupClickListeners();
+        setupSearch();
     }
 
     private void initializeViews() {
         rvCategories = findViewById(R.id.rvProducts);
+        etSearch = findViewById(R.id.etSearch);
         btnHome = findViewById(R.id.btnHome);
         btnAllProducts = findViewById(R.id.btnAllProducts);
         btnProductCategories = findViewById(R.id.btnProductCategories);
@@ -64,6 +70,25 @@ public class ProductCategoriesActivity extends AppCompatActivity {
             btnLogin.setVisibility(View.GONE);
             btnSignUp.setVisibility(View.GONE);
         }
+    }
+
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (categoryAdapter != null) {
+                    categoryAdapter.filter(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     private void setupCategoryList() {

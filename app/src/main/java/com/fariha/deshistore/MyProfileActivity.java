@@ -10,11 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MyProfileActivity extends AppCompatActivity {
 
@@ -22,7 +19,7 @@ public class MyProfileActivity extends AppCompatActivity {
     private Button btnEditProfile, btnBackToHome, btnLogout;
     
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mFirestore;
     private String userId;
 
     @Override
@@ -31,7 +28,7 @@ public class MyProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_profile);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirestore = FirebaseFirestore.getInstance();
         
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
@@ -62,31 +59,29 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserData() {
-        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String fullName = dataSnapshot.child("fullName").getValue(String.class);
-                    String email = dataSnapshot.child("email").getValue(String.class);
-                    String phoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
-                    String dateOfBirth = dataSnapshot.child("dateOfBirth").getValue(String.class);
-                    String gender = dataSnapshot.child("gender").getValue(String.class);
-                    String city = dataSnapshot.child("city").getValue(String.class);
-                    
-                    tvFullName.setText(fullName != null ? fullName : "N/A");
-                    tvEmail.setText(email != null ? email : "N/A");
-                    tvPhoneNumber.setText(phoneNumber != null ? phoneNumber : "N/A");
-                    tvDateOfBirth.setText(dateOfBirth != null ? dateOfBirth : "N/A");
-                    tvGender.setText(gender != null ? gender : "N/A");
-                    tvCity.setText(city != null ? city : "N/A");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(MyProfileActivity.this, "Failed to load user data", Toast.LENGTH_SHORT).show();
-            }
-        });
+        mFirestore.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String fullName = documentSnapshot.getString("fullName");
+                        String email = documentSnapshot.getString("email");
+                        String phoneNumber = documentSnapshot.getString("phoneNumber");
+                        String dateOfBirth = documentSnapshot.getString("dateOfBirth");
+                        String gender = documentSnapshot.getString("gender");
+                        String city = documentSnapshot.getString("city");
+                        
+                        tvFullName.setText(fullName != null ? fullName : "N/A");
+                        tvEmail.setText(email != null ? email : "N/A");
+                        tvPhoneNumber.setText(phoneNumber != null ? phoneNumber : "N/A");
+                        tvDateOfBirth.setText(dateOfBirth != null ? dateOfBirth : "N/A");
+                        tvGender.setText(gender != null ? gender : "N/A");
+                        tvCity.setText(city != null ? city : "N/A");
+                    } else {
+                        Toast.makeText(MyProfileActivity.this, "User profile not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MyProfileActivity.this, "Failed to load user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void setupClickListeners() {

@@ -8,6 +8,7 @@ public class Product {
     private String unit;
     private String imageUrl;
     private String manufacturer;
+    private String description;
     private int recommendCount;
     private boolean isFavorite;
     private boolean isApproved;
@@ -110,6 +111,10 @@ public class Product {
         return rejectionReason;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     // Setters
     public void setId(String id) {
         this.id = id;
@@ -165,6 +170,10 @@ public class Product {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void incrementRecommendCount() {

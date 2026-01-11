@@ -25,6 +25,7 @@ public class ProductStatusActivity extends AppCompatActivity {
     private FirebaseFirestore mDatabase;
     private FirebaseAuth mAuth;
     private String vendorId;
+    private com.google.firebase.firestore.ListenerRegistration productsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,12 @@ public class ProductStatusActivity extends AppCompatActivity {
     }
 
     private void loadAllProducts() {
-        mDatabase.collection("products")
+        // Remove existing listener
+        if (productsListener != null) {
+            productsListener.remove();
+        }
+        
+        productsListener = mDatabase.collection("products")
                 .whereEqualTo("vendorId", vendorId)
                 .addSnapshotListener((queryDocumentSnapshots, error) -> {
                     if (error != null) {
@@ -69,5 +75,14 @@ public class ProductStatusActivity extends AppCompatActivity {
                     Toast.makeText(ProductStatusActivity.this, 
                             "Loaded " + productList.size() + " products", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (productsListener != null) {
+            productsListener.remove();
+            productsListener = null;
+        }
     }
 }

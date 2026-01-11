@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,7 +29,10 @@ import java.util.Set;
 
 public class MyFavouritesActivity extends AppCompatActivity {
 
+    private static final String TAG = "MyFavouritesActivity";
+    
     private RecyclerView rvFavourites;
+    private EditText etSearch;
     private ProductAdapter productAdapter;
     private List<Product> productList;
     private List<Product> favoriteProducts;
@@ -30,20 +40,27 @@ public class MyFavouritesActivity extends AppCompatActivity {
     private Button btnLogin, btnSignUp;
     private static final String PREFS_NAME = "FavoritesPrefs";
     private static final String FAVORITES_KEY = "favorites";
+    
+    private FirebaseFirestore db;
+    private ListenerRegistration productsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_favourites);
 
+        db = FirebaseFirestore.getInstance();
+        
         initializeViews();
-        setupProductList();
         setupRecyclerView();
         setupClickListeners();
+        setupSearch();
+        loadFavoriteProducts();
     }
 
     private void initializeViews() {
         rvFavourites = findViewById(R.id.rvProducts);
+        etSearch = findViewById(R.id.etSearch);
         btnHome = findViewById(R.id.btnHome);
         btnAllProducts = findViewById(R.id.btnAllProducts);
         btnProductCategories = findViewById(R.id.btnProductCategories);
@@ -108,17 +125,84 @@ public class MyFavouritesActivity extends AppCompatActivity {
         });
     }
 
-    private void setupProductList() {
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (productAdapter != null) {
+                    productAdapter.filter(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    private void loadFavoriteProducts() {
+        Log.d(TAG, "Loading favorite products...");
+        
         // Check if user is logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
-            // Show message that user needs to log in
             Toast.makeText(this, "Please log in to view your favorite products", Toast.LENGTH_LONG).show();
-            favoriteProducts = new ArrayList<>();
             return;
         }
         
-        // Initialize all products list with images (same as HomeActivity)
+        // Get favorites from SharedPreferences
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> favorites = prefs.getStringSet(FAVORITES_KEY, new HashSet<>());
+        
+        if (favorites.isEmpty()) {
+            Toast.makeText(this, "No favorite products yet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Log.d(TAG, "Favorites from prefs: " + favorites);
+        
+        // Load products from Firestore and filter by favorites
+        productsListener = db.collection("products")
+                .whereEqualTo("status", "approved")
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error loading products: " + error.getMessage());
+                        // Fall back to sample products
+                        loadSampleFavorites();
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        favoriteProducts = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            Product product = doc.toObject(Product.class);
+                            product.setId(doc.getId());
+                            // Only add if it's a favorite
+                            if (favorites.contains(doc.getId())) {
+                                favoriteProducts.add(product);
+                                Log.d(TAG, "Loaded favorite product: " + product.getName());
+                            }
+                        }
+                        
+                        Log.d(TAG, "Total favorite products from Firestore: " + favoriteProducts.size());
+                        
+                        // If no Firestore favorites found, try sample products
+                        if (favoriteProducts.isEmpty()) {
+                            loadSampleFavorites();
+                        } else {
+                            productAdapter.updateProductList(favoriteProducts);
+                            updateRecyclerViewHeight();
+                        }
+                    }
+                });
+    }
+
+    private void loadSampleFavorites() {
+        // Load from sample products
         productList = new ArrayList<>();
         
         productList.add(new Product("1", "Mojo", "Soft Drink", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd.", 0, false));
@@ -135,10 +219,10 @@ public class MyFavouritesActivity extends AppCompatActivity {
         productList.add(new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-ghee.jpg", "Pran Dairy Ltd.", 0, false));
         
         // Filter only favorite products
-        favoriteProducts = new ArrayList<>();
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         Set<String> favorites = prefs.getStringSet(FAVORITES_KEY, new HashSet<>());
         
+        favoriteProducts = new ArrayList<>();
         for (Product product : productList) {
             if (favorites.contains(product.getId())) {
                 favoriteProducts.add(product);
@@ -148,14 +232,20 @@ public class MyFavouritesActivity extends AppCompatActivity {
         if (favoriteProducts.isEmpty()) {
             Toast.makeText(this, "No favorite products yet", Toast.LENGTH_SHORT).show();
         }
+        
+        productAdapter.updateProductList(favoriteProducts);
+        updateRecyclerViewHeight();
     }
 
     private void setupRecyclerView() {
+        favoriteProducts = new ArrayList<>();
         productAdapter = new ProductAdapter(this, favoriteProducts);
         rvFavourites.setLayoutManager(new GridLayoutManager(this, 2));
         rvFavourites.setAdapter(productAdapter);
         rvFavourites.setHasFixedSize(false);
-        
+    }
+    
+    private void updateRecyclerViewHeight() {
         // Calculate and set minimum height based on item count
         // Approximate item height: 400dp per item + extra padding
         int itemHeight = (int) (400 * getResources().getDisplayMetrics().density);
@@ -169,9 +259,14 @@ public class MyFavouritesActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Refresh favorites list when returning to this activity
-        setupProductList();
-        if (productAdapter != null) {
-            productAdapter.updateProductList(favoriteProducts);
+        loadFavoriteProducts();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (productsListener != null) {
+            productsListener.remove();
         }
     }
 

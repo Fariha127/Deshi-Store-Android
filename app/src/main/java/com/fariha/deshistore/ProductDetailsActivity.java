@@ -2,7 +2,11 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,35 +24,49 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ProductDetailsActivity extends AppCompatActivity {
 
+    private static final String TAG = "ProductDetailsActivity";
+    
     private Button btnBack, btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
     private Button btnLogin, btnSignUp, btnRecommend, btnFavourite, btnSubmitReview;
     private ImageView ivProductImage;
     private TextView tvProductName, tvManufacturer, tvCategoryBadge, tvSubcategory, tvPrice;
-    private TextView tvRecommendations, tvRating, tvReviewCount;
+    private TextView tvRecommendations, tvRating, tvReviewCount, tvNoReviews;
     private Spinner spinnerRating;
     private EditText etReview;
     private RecyclerView rvReviews;
 
     private Product product;
+    private String productId;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList;
     private boolean isFavorite = false;
     private boolean hasRecommended = false;
+    
+    private FirebaseFirestore db;
+    private ListenerRegistration reviewsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_details);
 
+        db = FirebaseFirestore.getInstance();
+        
         try {
             initializeViews();
             loadProductData();
@@ -95,6 +113,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
         etReview = findViewById(R.id.etReview);
         btnSubmitReview = findViewById(R.id.btnSubmitReview);
         rvReviews = findViewById(R.id.rvReviews);
+        tvNoReviews = findViewById(R.id.tvNoReviews);
         
         checkLoginStatus();
     }
@@ -109,15 +128,55 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private void loadProductData() {
         // Get product ID from intent
-        String productId = getIntent().getStringExtra("product_id");
+        productId = getIntent().getStringExtra("product_id");
         
-        // TODO: Get product data from Firebase using productId
-        // For now, using sample data based on product ID
-        product = getProductById(productId != null ? productId : "1");
-        
-        if (product == null) {
+        if (productId == null || productId.isEmpty()) {
             Toast.makeText(this, "Product not found", Toast.LENGTH_SHORT).show();
             finish();
+            return;
+        }
+        
+        Log.d(TAG, "Loading product with ID: " + productId);
+        
+        // First try to load from Firestore
+        db.collection("products").document(productId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Product found in Firestore
+                        product = documentSnapshot.toObject(Product.class);
+                        if (product != null) {
+                            product.setId(documentSnapshot.getId());
+                            Log.d(TAG, "Loaded product from Firestore: " + product.getName());
+                            displayProductData();
+                        }
+                    } else {
+                        // Not found in Firestore, try sample products
+                        Log.d(TAG, "Product not in Firestore, trying sample products");
+                        product = getSampleProductById(productId);
+                        if (product != null) {
+                            displayProductData();
+                        } else {
+                            Toast.makeText(this, "Product not found", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error loading product from Firestore: " + e.getMessage());
+                    // Fall back to sample products
+                    product = getSampleProductById(productId);
+                    if (product != null) {
+                        displayProductData();
+                    } else {
+                        Toast.makeText(this, "Error loading product", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+    }
+    
+    private void displayProductData() {
+        if (product == null) {
             return;
         }
 
@@ -127,10 +186,10 @@ public class ProductDetailsActivity extends AppCompatActivity {
             tvManufacturer.setText(product.getManufacturer());
         }
         if (tvCategoryBadge != null) tvCategoryBadge.setText(product.getCategory());
-        if (tvSubcategory != null) tvSubcategory.setText("Soft Drink"); // TODO: Add subcategory to Product model
+        if (tvSubcategory != null) tvSubcategory.setText(product.getCategory()); 
         if (tvPrice != null) {
             tvPrice.setText(String.format(Locale.getDefault(), "৳ %.0f/%s", 
-                    product.getPrice(), product.getUnit()));
+                    product.getPrice(), product.getUnit() != null ? product.getUnit() : "unit"));
         }
         if (tvRecommendations != null) {
             tvRecommendations.setText(product.getRecommendCount() + " Recommendations");
@@ -138,19 +197,31 @@ public class ProductDetailsActivity extends AppCompatActivity {
         
         // Load product image
         if (ivProductImage != null && product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            Glide.with(this)
-                    .load(product.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
-                    .into(ivProductImage);
+            String imageUrl = product.getImageUrl();
+            if (imageUrl.startsWith("data:image")) {
+                try {
+                    String base64Data = imageUrl.substring(imageUrl.indexOf(",") + 1);
+                    byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    ivProductImage.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    ivProductImage.setImageResource(R.drawable.ic_launcher_background);
+                }
+            } else {
+                Glide.with(this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_launcher_background)
+                        .error(R.drawable.ic_launcher_background)
+                        .into(ivProductImage);
+            }
         }
         
         // Calculate and display rating
         updateRatingDisplay();
     }
     
-    private Product getProductById(String productId) {
-        // Sample products with images - TODO: Replace with Firebase data
+    private Product getSampleProductById(String productId) {
+        // Sample products with images
         switch (productId) {
             case "1":
                 return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
@@ -177,7 +248,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
             case "12":
                 return new Product("12", "Pran Premium Ghee", "Cooking Ghee", 250.0, "500g", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/pran-ghee.jpg", "Pran Dairy Ltd.", 19, false);
             default:
-                return new Product("1", "Mojo", "Beverages", 25.0, "250ml", "https://raw.githubusercontent.com/Fariha127/Deshi-Store-Android/main/images/mojo.jpg", "Akij Food & Beverage Ltd. (AFBL)", 16, false);
+                // Return null for unknown IDs - don't default to Mojo
+                return null;
         }
     }
 
@@ -194,22 +266,90 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private void setupReviews() {
         reviewList = new ArrayList<>();
         
-        // Sample review
-        reviewList.add(new Review(
-                "1",
-                "1", // product ID
-                "Ahmed Khan",
-                "user1",
-                5,
-                "Great energy drink! Very refreshing.",
-                new Date()
-        ));
-
         if (rvReviews != null) {
             reviewAdapter = new ReviewAdapter(this, reviewList);
             rvReviews.setLayoutManager(new LinearLayoutManager(this));
             rvReviews.setAdapter(reviewAdapter);
         }
+        
+        // Load reviews from Firestore
+        loadReviewsFromFirestore();
+    }
+    
+    private void loadReviewsFromFirestore() {
+        if (productId == null) {
+            Log.e(TAG, "productId is null, cannot load reviews");
+            return;
+        }
+        
+        Log.d(TAG, "Loading reviews for product: " + productId);
+        
+        // Simple query without orderBy to avoid composite index requirement
+        // Reviews will be sorted client-side
+        reviewsListener = db.collection("reviews")
+                .whereEqualTo("productId", productId)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error loading reviews: " + error.getMessage());
+                        // Show error to user
+                        Toast.makeText(ProductDetailsActivity.this, 
+                                "Error loading reviews", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    if (snapshots != null) {
+                        reviewList.clear();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            try {
+                                Review review = new Review();
+                                review.setId(doc.getId());
+                                review.setProductId(doc.getString("productId"));
+                                review.setReviewerName(doc.getString("reviewerName"));
+                                review.setUserId(doc.getString("userId"));
+                                review.setReviewText(doc.getString("reviewText"));
+                                
+                                // Handle rating (might be Long from Firestore)
+                                Long ratingLong = doc.getLong("rating");
+                                review.setRating(ratingLong != null ? ratingLong.intValue() : 5);
+                                
+                                // Handle date (Firestore Timestamp)
+                                if (doc.getTimestamp("date") != null) {
+                                    review.setDate(doc.getTimestamp("date").toDate());
+                                } else {
+                                    review.setDate(new Date());
+                                }
+                                
+                                reviewList.add(review);
+                                Log.d(TAG, "Loaded review from: " + review.getReviewerName() + 
+                                        " - " + review.getReviewText());
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error parsing review: " + e.getMessage());
+                            }
+                        }
+                        
+                        // Sort by date descending (newest first)
+                        reviewList.sort((r1, r2) -> {
+                            if (r1.getDate() == null && r2.getDate() == null) return 0;
+                            if (r1.getDate() == null) return 1;
+                            if (r2.getDate() == null) return -1;
+                            return r2.getDate().compareTo(r1.getDate());
+                        });
+                        
+                        Log.d(TAG, "Total reviews loaded: " + reviewList.size());
+                        
+                        // Show/hide no reviews placeholder
+                        if (reviewList.isEmpty()) {
+                            tvNoReviews.setVisibility(View.VISIBLE);
+                            rvReviews.setVisibility(View.GONE);
+                        } else {
+                            tvNoReviews.setVisibility(View.GONE);
+                            rvReviews.setVisibility(View.VISIBLE);
+                        }
+                        
+                        reviewAdapter.notifyDataSetChanged();
+                        updateRatingDisplay();
+                    }
+                });
     }
 
     private void updateRatingDisplay() {
@@ -375,28 +515,62 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         int rating = Integer.parseInt(spinnerRating.getSelectedItem().toString());
         
-        // Create new review
-        Review newReview = new Review(
-                String.valueOf(System.currentTimeMillis()),
-                product.getId(),
-                "Current User", // TODO: Get from logged in user
-                "currentUserId", // TODO: Get from logged in user
-                rating,
-                reviewText,
-                new Date()
-        );
-
-        // Add to list and update UI
-        reviewList.add(0, newReview);
-        reviewAdapter.notifyItemInserted(0);
-        updateRatingDisplay();
-
-        // Clear input
-        etReview.setText("");
-        spinnerRating.setSelection(4);
-
-        Toast.makeText(this, "Review submitted successfully!", Toast.LENGTH_SHORT).show();
+        // Get user display name
+        String userName = user.getDisplayName();
+        if (userName == null || userName.isEmpty()) {
+            userName = user.getEmail();
+            if (userName != null && userName.contains("@")) {
+                userName = userName.substring(0, userName.indexOf("@"));
+            }
+        }
         
-        // TODO: Save to database
+        // Create review data for Firestore
+        Map<String, Object> reviewData = new HashMap<>();
+        reviewData.put("productId", productId);
+        reviewData.put("reviewerName", userName);
+        reviewData.put("userId", user.getUid());
+        reviewData.put("rating", rating);
+        reviewData.put("reviewText", reviewText);
+        reviewData.put("date", new Date());
+        
+        // Disable button while submitting
+        btnSubmitReview.setEnabled(false);
+        btnSubmitReview.setText("Submitting...");
+        
+        // Save to Firestore
+        db.collection("reviews")
+                .add(reviewData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Review saved with ID: " + documentReference.getId());
+                    
+                    // Clear input
+                    etReview.setText("");
+                    spinnerRating.setSelection(4);
+                    
+                    // Re-enable button
+                    btnSubmitReview.setEnabled(true);
+                    btnSubmitReview.setText("Submit Review");
+                    
+                    Toast.makeText(this, "Review submitted successfully!", Toast.LENGTH_SHORT).show();
+                    
+                    // The snapshot listener will automatically update the list
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error saving review: " + e.getMessage());
+                    
+                    // Re-enable button
+                    btnSubmitReview.setEnabled(true);
+                    btnSubmitReview.setText("Submit Review");
+                    
+                    Toast.makeText(this, "Failed to submit review. Please try again.", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (reviewsListener != null) {
+            reviewsListener.remove();
+        }
     }
 }

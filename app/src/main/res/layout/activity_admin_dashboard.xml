@@ -6,14 +6,17 @@
     android:orientation="vertical"
     android:background="#E8F5E9">
 
-    <!-- Header -->
+    <!-- Header with Logout Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#4CAF50"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
         <TextView
             android:layout_width="0dp"
@@ -25,56 +28,78 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/button_orange"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Logout"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#4CAF50"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnInitAccounts"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/button_green"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="Init Accounts"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:layout_marginEnd="4dp" />
+            android:textSize="12sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnInitProducts"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/button_green"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:text="Init Products"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:layout_marginEnd="8dp" />
+            android:textSize="12sp" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnLogout"
+            android:id="@+id/btnMigrateUsers"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:background="@drawable/button_orange"
-            android:text="Logout"
+            android:background="@drawable/button_red"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Migrate Users"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <!-- TabLayout -->
+
+    <!-- ViewPager2 -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        app:tabTextColor="#666666"
-        app:tabSelectedTextColor="#4CAF50"
         app:tabIndicatorColor="#4CAF50"
-        app:tabMode="scrollable" />
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="#4CAF50"
+        app:tabTextColor="#666666" />
 
-    <!-- ViewPager2 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"

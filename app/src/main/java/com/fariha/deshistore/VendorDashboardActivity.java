@@ -2,6 +2,7 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ public class VendorDashboardActivity extends AppCompatActivity {
     private FirebaseFirestore mDatabase;
     private FirebaseAuth mAuth;
     private String vendorId;
+    private com.google.firebase.firestore.ListenerRegistration productsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class VendorDashboardActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         productList = new ArrayList<>();
-        adapter = new ProductAdapter(this, productList);
+        adapter = new ProductAdapter(this, productList, true); // Vendor view mode
         recyclerView.setAdapter(adapter);
 
         btnAddProduct.setOnClickListener(v -> {
@@ -55,6 +57,11 @@ public class VendorDashboardActivity extends AppCompatActivity {
         });
 
         btnLogout.setOnClickListener(v -> {
+            // Remove listeners before signing out to prevent permission errors
+            if (productsListener != null) {
+                productsListener.remove();
+                productsListener = null;
+            }
             mAuth.signOut();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -70,24 +77,49 @@ public class VendorDashboardActivity extends AppCompatActivity {
     }
 
     private void loadApprovedProducts() {
-        mDatabase.collection("products")
+        Log.d("VendorDashboard", "Loading products for vendorId: " + vendorId);
+        
+        if (vendorId == null || vendorId.isEmpty()) {
+            Log.e("VendorDashboard", "VendorId is null or empty!");
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Remove existing listener
+        if (productsListener != null) {
+            productsListener.remove();
+        }
+        
+        productsListener = mDatabase.collection("products")
                 .whereEqualTo("vendorId", vendorId)
                 .whereEqualTo("status", "approved")
                 .addSnapshotListener((queryDocumentSnapshots, error) -> {
                     if (error != null) {
-                        Toast.makeText(VendorDashboardActivity.this, "Error loading products", Toast.LENGTH_SHORT).show();
+                        Log.e("VendorDashboard", "Error loading products: " + error.getMessage(), error);
+                        Toast.makeText(VendorDashboardActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
                         return;
                     }
                     
                     productList.clear();
                     if (queryDocumentSnapshots != null) {
+                        Log.d("VendorDashboard", "Found " + queryDocumentSnapshots.size() + " products");
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             Product product = document.toObject(Product.class);
                             product.setProductId(document.getId());
                             productList.add(product);
+                            Log.d("VendorDashboard", "Product: " + product.getName() + " ID: " + document.getId());
                         }
                     }
                     adapter.notifyDataSetChanged();
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (productsListener != null) {
+            productsListener.remove();
+            productsListener = null;
+        }
     }
 }

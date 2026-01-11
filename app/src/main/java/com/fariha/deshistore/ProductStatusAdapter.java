@@ -1,5 +1,9 @@
 package com.fariha.deshistore;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,11 +66,30 @@ public class ProductStatusAdapter extends RecyclerView.Adapter<ProductStatusAdap
         }
         
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(product.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .into(holder.ivProduct);
+            String imageUrl = product.getImageUrl();
+            if (imageUrl.startsWith("data:image")) {
+                try {
+                    String base64Data = imageUrl.substring(imageUrl.indexOf(",") + 1);
+                    byte[] decodedBytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    holder.ivProduct.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    holder.ivProduct.setImageResource(R.drawable.ic_launcher_foreground);
+                }
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .into(holder.ivProduct);
+            }
         }
+        
+        // Add click listener to view/edit product details
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), VendorProductDetailsActivity.class);
+            intent.putExtra("product_id", product.getProductId());
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override

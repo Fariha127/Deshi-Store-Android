@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class CategoryProductsActivity extends AppCompatActivity {
     private String categoryName;
     private TextView tvCategoryTitle;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
+    private Button btnLogin, btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +50,15 @@ public class CategoryProductsActivity extends AppCompatActivity {
         btnNewlyAdded = findViewById(R.id.btnNewlyAdded);
         btnMyFavourites = findViewById(R.id.btnMyFavourites);
         btnFavouriteCategories = findViewById(R.id.btnFavouriteCategories);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnSignUp = findViewById(R.id.btnSignUp);
         
         // Show category title
         tvCategoryTitle.setText(categoryName);
         tvCategoryTitle.setVisibility(View.VISIBLE);
+        
+        // Check login status to hide/show auth buttons
+        checkLoginStatus();
         
         // Highlight Product Categories button with white text
         btnProductCategories.setBackgroundResource(R.drawable.button_green);
@@ -148,6 +157,23 @@ public class CategoryProductsActivity extends AppCompatActivity {
             startActivity(new Intent(this, FavouriteCategoriesActivity.class));
             finish();
         });
+
+        btnLogin.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
+        });
+
+        btnSignUp.setOnClickListener(v -> {
+            startActivity(new Intent(this, UserSignUpActivity.class));
+        });
+    }
+
+    private void checkLoginStatus() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // User is logged in, hide auth buttons
+            btnLogin.setVisibility(View.GONE);
+            btnSignUp.setVisibility(View.GONE);
+        }
     }
 
     @Override

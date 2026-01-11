@@ -2,6 +2,9 @@ package com.fariha.deshistore;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,12 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private static final String TAG = "HomeActivity";
+    
     private EditText etSearch;
     private Button btnHome, btnAllProducts, btnProductCategories, btnNewlyAdded, btnMyFavourites, btnFavouriteCategories;
     private Button btnLogin, btnSignUp, btnProfile;
@@ -28,16 +36,22 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProductAdapter productAdapter;
     private List<Product> productList;
+    
+    private FirebaseFirestore db;
+    private ListenerRegistration productsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        db = FirebaseFirestore.getInstance();
+        
         initializeViews();
-        setupProductList();
         setupRecyclerView();
         setupClickListeners();
+        setupSearch();
+        loadApprovedProducts();
     }
 
     private void initializeViews() {
@@ -75,7 +89,61 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void setupProductList() {
+    private void setupSearch() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (productAdapter != null) {
+                    productAdapter.filter(s.toString());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    private void loadApprovedProducts() {
+        Log.d(TAG, "Loading approved products from Firestore...");
+        
+        // Load approved products from Firestore for the home page
+        productsListener = db.collection("products")
+                .whereEqualTo("status", "approved")
+                .limit(12) // Show up to 12 products on home page
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error loading products: " + error.getMessage());
+                        // Fall back to sample products if Firestore fails
+                        loadSampleProducts();
+                        return;
+                    }
+
+                    if (snapshots != null && !snapshots.isEmpty()) {
+                        productList = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            Product product = doc.toObject(Product.class);
+                            product.setId(doc.getId());
+                            productList.add(product);
+                            Log.d(TAG, "Loaded product: " + product.getName());
+                        }
+                        
+                        Log.d(TAG, "Total approved products loaded: " + productList.size());
+                        productAdapter.updateProductList(productList);
+                        updateRecyclerViewHeight();
+                    } else {
+                        // No approved products in Firestore, show sample products
+                        Log.d(TAG, "No approved products found, showing sample products");
+                        loadSampleProducts();
+                    }
+                });
+    }
+
+    private void loadSampleProducts() {
         productList = new ArrayList<>();
         
         // Sample data with actual product images from images folder
@@ -223,14 +291,20 @@ public class HomeActivity extends AppCompatActivity {
                 0,
                 false
         ));
+        
+        productAdapter.updateProductList(productList);
+        updateRecyclerViewHeight();
     }
 
     private void setupRecyclerView() {
+        productList = new ArrayList<>();
         productAdapter = new ProductAdapter(this, productList);
         rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
         rvProducts.setAdapter(productAdapter);
         rvProducts.setHasFixedSize(false);
-        
+    }
+    
+    private void updateRecyclerViewHeight() {
         // Calculate and set minimum height based on item count
         // Approximate item height: 400dp per item + extra padding
         int itemHeight = (int) (400 * getResources().getDisplayMetrics().density);
@@ -291,5 +365,13 @@ public class HomeActivity extends AppCompatActivity {
             // View all products
             startActivity(new Intent(this, AllProductsActivity.class));
         });
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (productsListener != null) {
+            productsListener.remove();
+        }
     }
 }

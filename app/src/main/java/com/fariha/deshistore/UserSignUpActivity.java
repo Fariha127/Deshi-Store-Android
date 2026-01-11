@@ -15,12 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import android.os.Handler;
+import android.os.Looper;
 
 public class UserSignUpActivity extends AppCompatActivity {
 
@@ -33,7 +34,7 @@ public class UserSignUpActivity extends AppCompatActivity {
     private boolean isConfirmPasswordVisible = false;
     
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +42,7 @@ public class UserSignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_signup);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirestore = FirebaseFirestore.getInstance();
 
         initializeViews();
         setupGenderSpinner();
@@ -242,14 +243,33 @@ public class UserSignUpActivity extends AppCompatActivity {
         userData.put("city", city);
         userData.put("userType", "User");
 
-        mDatabase.child("users").child(userId).setValue(userData)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, LoginActivity.class));
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to save user data", Toast.LENGTH_SHORT).show();
-                });
+        // Write to Firestore with retry (exponential backoff)
+        final int maxAttempts = 3;
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        class Writer {
+            void write(final int attempt) {
+                mFirestore.collection("users")
+                        .document(userId)
+                        .set(userData)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(UserSignUpActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(UserSignUpActivity.this, LoginActivity.class));
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            if (attempt < maxAttempts) {
+                                long delayMs = (long) Math.pow(2, attempt) * 1000L; // 2^attempt seconds
+                                handler.postDelayed(() -> write(attempt + 1), delayMs);
+                            } else {
+                                Toast.makeText(UserSignUpActivity.this, "Registration saved but failed to sync to server. Please contact support.", Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(UserSignUpActivity.this, LoginActivity.class));
+                                finish();
+                            }
+                        });
+            }
+        }
+
+        new Writer().write(0);
     }
 }

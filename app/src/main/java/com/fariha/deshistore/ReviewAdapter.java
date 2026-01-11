@@ -38,7 +38,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
         holder.tvReviewerName.setText(review.getReviewerName());
         holder.tvReviewText.setText(review.getReviewText());
-        holder.tvReviewDate.setText(dateFormat.format(review.getDate()));
+        
+        // Handle date (might be null)
+        if (review.getDate() != null) {
+            holder.tvReviewDate.setText(dateFormat.format(review.getDate()));
+        } else {
+            holder.tvReviewDate.setText("Recently");
+        }
 
         // Display stars based on rating
         String stars = getStarsString(review.getRating());

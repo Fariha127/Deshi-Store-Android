@@ -16,11 +16,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -34,7 +30,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private Button btnSendCode, btnSaveProfile, btnCancel, btnBackToHome, btnLogout;
     
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private FirebaseFirestore mFirestore;
     private String userId;
     private String originalEmail;
     private boolean emailChanged = false;
@@ -46,7 +42,7 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirestore = FirebaseFirestore.getInstance();
         
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
@@ -91,41 +87,37 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void loadUserData() {
-        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String fullName = dataSnapshot.child("fullName").getValue(String.class);
-                    String email = dataSnapshot.child("email").getValue(String.class);
-                    String phoneNumber = dataSnapshot.child("phoneNumber").getValue(String.class);
-                    String dateOfBirth = dataSnapshot.child("dateOfBirth").getValue(String.class);
-                    String gender = dataSnapshot.child("gender").getValue(String.class);
-                    String city = dataSnapshot.child("city").getValue(String.class);
-                    
-                    if (fullName != null && !fullName.isEmpty()) etFullName.setText(fullName);
-                    if (email != null && !email.isEmpty()) etEmail.setText(email);
-                    if (phoneNumber != null && !phoneNumber.isEmpty()) etPhoneNumber.setText(phoneNumber);
-                    if (dateOfBirth != null && !dateOfBirth.isEmpty()) etDateOfBirth.setText(dateOfBirth);
-                    if (city != null && !city.isEmpty()) etCity.setText(city);
-                    
-                    // Set gender spinner
-                    if (gender != null && !gender.isEmpty()) {
-                        String[] genders = {"Male", "Female", "Other"};
-                        for (int i = 0; i < genders.length; i++) {
-                            if (genders[i].equals(gender)) {
-                                spinnerGender.setSelection(i);
-                                break;
+        mFirestore.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String fullName = documentSnapshot.getString("fullName");
+                        String email = documentSnapshot.getString("email");
+                        String phoneNumber = documentSnapshot.getString("phoneNumber");
+                        String dateOfBirth = documentSnapshot.getString("dateOfBirth");
+                        String gender = documentSnapshot.getString("gender");
+                        String city = documentSnapshot.getString("city");
+                        
+                        if (fullName != null && !fullName.isEmpty()) etFullName.setText(fullName);
+                        if (email != null && !email.isEmpty()) etEmail.setText(email);
+                        if (phoneNumber != null && !phoneNumber.isEmpty()) etPhoneNumber.setText(phoneNumber);
+                        if (dateOfBirth != null && !dateOfBirth.isEmpty()) etDateOfBirth.setText(dateOfBirth);
+                        if (city != null && !city.isEmpty()) etCity.setText(city);
+                        
+                        // Set gender spinner
+                        if (gender != null && !gender.isEmpty()) {
+                            String[] genders = {"Male", "Female", "Other"};
+                            for (int i = 0; i < genders.length; i++) {
+                                if (genders[i].equals(gender)) {
+                                    spinnerGender.setSelection(i);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(EditProfileActivity.this, "Failed to load user data", Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(EditProfileActivity.this, "Failed to load user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void setupClickListeners() {
@@ -286,7 +278,7 @@ public class EditProfileActivity extends AppCompatActivity {
             changePassword(currentPassword, newPassword);
         }
 
-        // Update profile data in database
+        // Update profile data in Firestore
         Map<String, Object> updates = new HashMap<>();
         updates.put("fullName", fullName);
         updates.put("email", email);
@@ -295,7 +287,7 @@ public class EditProfileActivity extends AppCompatActivity {
         updates.put("gender", gender);
         updates.put("city", city);
 
-        mDatabase.child("users").child(userId).updateChildren(updates)
+        mFirestore.collection("users").document(userId).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     // Update email in Firebase Auth if changed
                     if (emailChanged && emailVerified && !email.equals(originalEmail)) {

@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,12 +28,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private Context context;
     private List<Category> categoryList;
+    private List<Category> categoryListFull; // For search filtering
     private static final String PREFS_NAME = "FavoritesPrefs";
     private static final String FAVORITE_CATEGORIES_KEY = "favorite_categories";
 
     public CategoryAdapter(Context context, List<Category> categoryList) {
         this.context = context;
         this.categoryList = categoryList;
+        this.categoryListFull = new ArrayList<>(categoryList);
     }
 
     @NonNull
@@ -158,6 +161,32 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     public void updateCategoryList(List<Category> newCategoryList) {
         this.categoryList = newCategoryList;
+        this.categoryListFull = new ArrayList<>(newCategoryList);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Filter categories by search query (name or description)
+     * @param query The search query string
+     */
+    public void filter(String query) {
+        categoryList.clear();
+        if (query == null || query.trim().isEmpty()) {
+            categoryList.addAll(categoryListFull);
+        } else {
+            String searchQuery = query.toLowerCase().trim();
+            for (Category category : categoryListFull) {
+                // Search in name and description
+                boolean matchesName = category.getName() != null && 
+                        category.getName().toLowerCase().contains(searchQuery);
+                boolean matchesDescription = category.getDescription() != null && 
+                        category.getDescription().toLowerCase().contains(searchQuery);
+                
+                if (matchesName || matchesDescription) {
+                    categoryList.add(category);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 }

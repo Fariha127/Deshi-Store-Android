@@ -115,12 +115,30 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Handle Admin login
+        // Handle Admin login - authenticate with Firebase first
         if (loginType.equals("Admin")) {
             if (email.equals(ADMIN_EMAIL) && password.equals(ADMIN_PASSWORD)) {
-                Toast.makeText(this, "Admin login successful", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, AdminDashboardActivity.class));
-                finish();
+                // Sign in admin with Firebase to get a valid auth session
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(this, "Admin login successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(this, AdminDashboardActivity.class));
+                                finish();
+                            } else {
+                                // If Firebase sign-in fails, create the admin account first
+                                mAuth.createUserWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener(this, createTask -> {
+                                            if (createTask.isSuccessful()) {
+                                                Toast.makeText(this, "Admin account created and logged in", Toast.LENGTH_SHORT).show();
+                                                startActivity(new Intent(this, AdminDashboardActivity.class));
+                                                finish();
+                                            } else {
+                                                Toast.makeText(this, "Admin login failed: " + createTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                            }
+                        });
             } else {
                 Toast.makeText(this, "Incorrect email or password!", Toast.LENGTH_SHORT).show();
             }
