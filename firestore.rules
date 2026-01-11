@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // TESTING RULES - Allow all authenticated users full access
+    // TODO: Tighten these rules for production
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Products collection - anyone can read, only authenticated can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Categories collection
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Reviews collection - anyone can read, only authenticated can write
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
